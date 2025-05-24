@@ -1,48 +1,49 @@
- /* Estilos generales */
+/* Estilos generales */
+h1{
+  text-align: center;
+}
 body {
   font-family: sans-serif;
   margin: 0;
   padding: 0;
   color: #333;
+  height: 100vh;
+  overflow: hidden;
 }
 
 /* Estilos para body específico de dashboard e historial */
 .dashboard-body {
   background-color: #f4fdf4;
+  margin: 0;
 }
 
-/* Estilos para body específico de formularios */
+/* Estilos para body específico de formularios (login y registro) */
+
+
 .form-body {
-  background-color: #e8f5e9;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background-color: #e8f5e9;
+  margin: 0;
+  padding: 0;
   height: 100vh;
+  position: relative;
 }
 
 /* Estilos de encabezado */
-header, .dashboard-header {
+header,
+.dashboard-header {
   background-color: #2e7d32;
   color: white;
   padding: 1em 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.container {
-  width: 90%;
-  max-width: 1100px;
-  margin: auto;
-}
-
-h1 {
+.dashboard-header h1 {
   margin: 0.2em 0;
-  text-align: center;
-}
-
-nav a {
-  margin: 0 1em;
-  color: white;
-  text-decoration: none;
-  font-weight: bold;
 }
 
 .dashboard-header nav ul {
@@ -52,8 +53,20 @@ nav a {
   gap: 1em;
 }
 
+.dashboard-header nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  padding: 15px; /* Añadido del admin.css */
+}
+
+.dashboard-header nav a:hover {
+  color: #a5d6a7;
+}
+
 /* Estilos principales */
-.dashboard-main, main {
+.dashboard-main,
+main {
   padding: 2em;
 }
 
@@ -74,44 +87,6 @@ nav a {
   width: 200px;
   text-align: center;
   color: #2e7d32;
-}
-
-/* Estilos de tablas */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-}
-
-table th, table td {
-  padding: 1em;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-table th {
-  background-color: #a5d6a7;
-  color: #2e7d32;
-}
-
-/* Estilos específicos para historial */
-.table-container {
-  width: 90%;
-  max-width: 1000px;
-  margin: 2em auto;
-  overflow-x: auto;
-}
-
-.recycling-table th {
-  background-color: #4caf50;
-  color: white;
-}
-
-.recycling-table tr:hover {
-  background-color: #f1f1f1;
 }
 
 /* Estilos de héroe (inicio) */
@@ -153,8 +128,9 @@ table th {
   border-left: 4px solid #66bb6a;
 }
 
-/* Estilos de formulario (login, registro) */
-.login-container, .form-container {
+/* Estilos de formulario (login, registro, registro reciclaje) */
+.login-container,
+.form-container {
   background-color: white;
   padding: 2em 3em;
   border-radius: 10px;
@@ -163,19 +139,26 @@ table th {
   max-width: 400px;
 }
 
-.login-container h2, .form-container h2 {
+.login-container h2,
+.form-container h2 {
   text-align: center;
   margin-bottom: 1.5em;
   color: #2e7d32;
 }
 
+.form-group {
+  margin-bottom: 1.2em;
+}
+
 label {
   display: block;
-  margin-bottom: 0.3em;
+  margin-bottom: 0.5em;
+  font-weight: bold;
   color: #555;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 0.7em;
   margin-bottom: 1em;
@@ -214,6 +197,51 @@ input, select {
   text-decoration: none;
 }
 
+/* Estilos de mapa (registro reciclaje) */
+.map-container {
+  width: 100%;
+  height: 70vh;
+  margin-top: 2em;
+}
+
+/* Estilos de modal (registro reciclaje) */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1001;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fff;
+  margin: 5% auto;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.close-button {
+  background-color: red;
+  color: white;
+  float: right;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.close-button:hover {
+  color: darkred;
+}
+
 /* Estilos de imagen (inicio) */
 .imagen-inicio {
   max-width: 250px;
@@ -224,4 +252,173 @@ footer {
   text-align: center;
   padding: 1em;
   background: #c8e6c9;
+}
+
+/* Estilos de tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+table th,
+table td {
+  padding: 1em;
+  text-align: center;
+  border: 1px solid #ddd;
+}
+
+table th {
+  background-color: #a5d6a7;
+  color: #1b5e20;
+}
+
+table td {
+  color: #333;
+}
+
+.recycling-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Estilos para el panel de administración */
+.admin-panel {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2em;
+  margin-top: 2em;
+}
+
+.admin-card {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 1.5em;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.admin-card h2 {
+  margin-bottom: 0.5em;
+  color: #4caf50;
+}
+
+.admin-btn {
+  display: inline-block;
+  margin-top: 1em;
+  padding: 0.6em 1.2em;
+  background-color: #4caf50;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.admin-btn:hover {
+  background-color: #43a047;
+}
+
+.tabla-usuarios {
+  padding: 2em;
+  background-color: #f4fdf4;
+}
+
+.tabla-usuarios h2 {
+  color: #2e7d32;
+  margin-bottom: 1em;
+}
+
+.imagen-tabla {
+  max-width: 50px;
+}
+
+.edit-btn,
+.delete-btn {
+  border: none;
+  padding: 0.5em 1em;
+  margin: 0 0.2em;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.edit-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.delete-btn {
+  background-color: #e53935;
+  color: white;
+}
+
+.edit-btn:hover {
+  background-color: #388e3c;
+}
+
+.delete-btn:hover {
+  background-color: #c62828;
+}
+
+/* Estilos para selectores de bitácora */
+#lista-bitacora {
+  background-color: #4caf50;
+  color: white;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  margin-top: 0.5em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+#lista-bitacora:hover {
+  background-color: #388e3c;
+}
+
+#lista-bitacora-menu {
+  background-color: #2e7d32;
+  color: white;
+  padding: 0.5em 1em;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  margin-top: 0.5em;
+}
+
+/* Estilos de mensajes de error */
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 0.8em;
+  border-radius: 5px;
+  margin-bottom: 1em;
+  text-align: center;
+}
+
+.action-cell {
+  text-align: center;
+}
+
+.canjear-btn {
+  background-color: #388e3c;
+  color: white;
+  padding: 0.5em 1em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.canjear-btn:hover {
+  background-color: #2e7d32;
 }

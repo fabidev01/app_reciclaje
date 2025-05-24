@@ -1,0 +1,94 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrar Reciclaje</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+
+<body class="form-body">
+  <div class="container">
+    <h1>Puntos de Reciclaje Disponibles</h1>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="error-message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <div id="map" class="map-container"></div>
+  </div>
+
+  <!-- Modal para registrar reciclaje -->
+  <div id="reciclajeModal" class="modal">
+    <div class="modal-content">
+      <span class="close-button">×</span>
+      <h2>Registrar Material Reciclado</h2>
+      <form action="{% url 'registro_reciclaje' %}" method="POST" class="reciclaje-form">
+        {% csrf_token %}
+        <input type="hidden" id="id_punto" name="punto" value="">
+        <div class="form-group">
+          <label for="tipo">Tipo de Material</label>
+          <select id="tipo" name="tipo" required>
+            <option value="">Seleccione</option>
+            {% for material in materiales %}
+              <option value="{{ material.0 }}">{{ material.1 }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="subtipo">Subtipo de Material</label>
+          <input type="text" id="subtipo" name="subtipo" placeholder="Ej. Botellas de plástico" required>
+        </div>
+
+        <div class="form-group">
+          <label for="cantidad">Cantidad (kg)</label>
+          <input type="number" step="0.1" min="0.1" id="cantidad" name="cantidad" placeholder="Ej. 2.5" required>
+        </div>
+
+        <button type="submit" class="submit-btn">Registrar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Inicializar el mapa
+    var map = L.map('map').setView([-17.3895, -66.1568], 11); // Centro en Cochabamba
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+
+    // Agregar marcadores para los puntos de reciclaje
+    var puntos = {{ puntos|safe }};
+    puntos.forEach(function(punto) {
+      var marker = L.marker([punto.latitud, punto.longitud]).addTo(map);
+      marker.bindPopup(
+        `<b>${punto.nombre}</b><br>` +
+        `<button onclick="openModal(${punto.id_punto_reciclaje})">Seleccionar</button>`
+      );
+    });
+
+    // Funciones para el modal
+    var modal = document.getElementById("reciclajeModal");
+    var span = document.getElementsByClassName("close-button")[0];
+
+    function openModal(idPunto) {
+      document.getElementById("id_punto").value = idPunto;
+      modal.style.display = "block";
+    }
+
+    span.onclick = function() {
+      modal.style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      if (event.target == modal) {
+        modal.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>

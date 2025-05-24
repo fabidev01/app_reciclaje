@@ -1,11 +1,11 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  {% load static %}
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrar Reciclaje</title>
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
 </head>
 
 <body class="form-body">
@@ -13,10 +13,10 @@
     <h2>Registrar Material Reciclado</h2>
     {% if messages %}
       {% for message in messages %}
-        <div class="message {{ message.tags }}">{{ message }}</div>
+        <div class="error-message {{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
-    <form action="{% url 'registro_reciclaje' %}" method="post" class="reciclaje-form">
+    <form action="{% url 'registro_reciclaje' %}" method="POST" class="reciclaje-form">
       {% csrf_token %}
       <div class="form-group">
         <label for="fecha">Fecha</label>
@@ -27,11 +27,24 @@
         <label for="tipo">Tipo de Material</label>
         <select id="tipo" name="tipo" required>
           <option value="">Seleccione</option>
-          <option value="plastico">Plástico (sin reciduos)</option>
-          <option value="papel">Papel</option>
-          <option value="vidrio">Vidrio</option>
-          <option value="metal">Metal</option>
-          <option value="otros">Otros</option>
+          {% for material in materiales %}
+            <option value="{{ material.0 }}">{{ material.1 }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="subtipo">Subtipo de Material</label>
+        <input type="text" id="subtipo" name="subtipo" placeholder="Ej. Botellas de plástico" required>
+      </div>
+
+      <div class="form-group">
+        <label for="punto">Punto de Reciclaje</label>
+        <select id="punto" name="punto" required>
+          <option value="">Seleccione</option>
+          {% for punto in puntos %}
+            <option value="{{ punto.0 }}">{{ punto.1 }} - {{ punto.2 }}</option>
+          {% endfor %}
         </select>
       </div>
 
