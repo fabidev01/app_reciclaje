@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Usuario</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+</head>
+
+<body class="dashboard-body">
+  <header class="dashboard-header">
+    <h1>Bienvenido, Usuario</h1>
+    <nav>
+      <ul>
+        <li><a href="{% url 'inicio'%}">Inicio</a></li>
+        <li><a href="{% url 'registro_reciclaje'%}">Registrar Reciclaje</a></li>
+        <li><a href="{% url 'inicio'%}">Recompensas</a></li>
+        <li><a href="{% url 'historial' %}">Historial</a></li>
+        <li><a href="{% url 'inicio' %}">Cerrar Sesión</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  
+  <main class="dashboard-main">
+    <section class="summary-cards">
+      <div class="card">
+        <h3>Total Reciclado</h3>
+        <p>35.2 kg</p>
+      </div>
+      <div class="card">
+        <h3>Puntos Acumulados</h3>
+        <p>480 pts</p>
+      </div>
+      <div class="card">
+        <h3>CO₂ Reducido</h3>
+        <p>12.6 kg</p>
+      </div>
+    </section>
+
+    <section class="activity">
+      <h2>Últimas Actividades</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Material</th>
+            <th>Cantidad</th>
+            <th>Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>15/05/2025</td>
+            <td>Papel</td>
+            <td>3 kg</td>
+            <td>30</td>
+          </tr>
+          <tr>
+            <td>10/05/2025</td>
+            <td>Vidrio</td>
+            <td>5 kg</td>
+            <td>50</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </main>
+</body>
+</html>

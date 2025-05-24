@@ -1,0 +1,227 @@
+ /* Estilos generales */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+  color: #333;
+}
+
+/* Estilos para body específico de dashboard e historial */
+.dashboard-body {
+  background-color: #f4fdf4;
+}
+
+/* Estilos para body específico de formularios */
+.form-body {
+  background-color: #e8f5e9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* Estilos de encabezado */
+header, .dashboard-header {
+  background-color: #2e7d32;
+  color: white;
+  padding: 1em 2em;
+}
+
+.container {
+  width: 90%;
+  max-width: 1100px;
+  margin: auto;
+}
+
+h1 {
+  margin: 0.2em 0;
+  text-align: center;
+}
+
+nav a {
+  margin: 0 1em;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.dashboard-header nav ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  gap: 1em;
+}
+
+/* Estilos principales */
+.dashboard-main, main {
+  padding: 2em;
+}
+
+/* Estilos de tarjetas (dashboard) */
+.summary-cards {
+  display: flex;
+  gap: 1.5em;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2em;
+}
+
+.card {
+  background-color: white;
+  padding: 1.5em;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.08);
+  width: 200px;
+  text-align: center;
+  color: #2e7d32;
+}
+
+/* Estilos de tablas */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+table th, table td {
+  padding: 1em;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+table th {
+  background-color: #a5d6a7;
+  color: #2e7d32;
+}
+
+/* Estilos específicos para historial */
+.table-container {
+  width: 90%;
+  max-width: 1000px;
+  margin: 2em auto;
+  overflow-x: auto;
+}
+
+.recycling-table th {
+  background-color: #4caf50;
+  color: white;
+}
+
+.recycling-table tr:hover {
+  background-color: #f1f1f1;
+}
+
+/* Estilos de héroe (inicio) */
+.hero {
+  background: #e8f5e9;
+  text-align: center;
+  padding: 3em 0;
+}
+
+.hero h2 {
+  font-size: 2em;
+  margin-bottom: 0.5em;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #388e3c;
+  color: white;
+  padding: 0.8em 1.5em;
+  border-radius: 5px;
+  text-decoration: none;
+  margin-top: 1em;
+}
+
+/* Estilos de beneficios (inicio) */
+.benefits {
+  padding: 2em 0;
+}
+
+.benefits ul {
+  list-style: none;
+  padding: 0;
+}
+
+.benefits li {
+  background: #f1f8e9;
+  margin: 0.5em 0;
+  padding: 1em;
+  border-left: 4px solid #66bb6a;
+}
+
+/* Estilos de formulario (login, registro) */
+.login-container, .form-container {
+  background-color: white;
+  padding: 2em 3em;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-container h2, .form-container h2 {
+  text-align: center;
+  margin-bottom: 1.5em;
+  color: #2e7d32;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.3em;
+  color: #555;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.7em;
+  margin-bottom: 1em;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 0.8em;
+  background-color: #43a047;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+  background-color: #2e7d32;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 1em;
+}
+
+.register-link a {
+  color: #388e3c;
+  text-decoration: none;
+}
+
+/* Estilos de imagen (inicio) */
+.imagen-inicio {
+  max-width: 250px;
+}
+
+/* Estilos de footer */
+footer {
+  text-align: center;
+  padding: 1em;
+  background: #c8e6c9;
+}

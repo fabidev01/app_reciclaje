@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plataforma de Reciclaje</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <h1>Recicla y Gana</h1>
+      <nav>
+        <a href="{% url 'inicio'%}">Inicio</a>
+        <a href="{% url 'login'%}">Iniciar Sesión</a>
+        <a href="{% url 'registro_usuario'%}">Registro</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="container">
+      <h2>Recicla, suma puntos y ayuda al planeta</h2>
+      <p>Transforma tus residuos en recompensas sostenibles.</p>
+      <a href="{%url 'dashboard'%}" class="btn">Comienza ahora</a>
+    </div>
+  </section>
+
+  <section class="benefits">
+    <div class="container">
+      <h3>¿Por qué usar nuestra plataforma?</h3>
+      <ul>
+        <li>♻️ Puntos por reciclar materiales</li>
+        <li>🌿 Catálogo de recompensas ecológicas</li>
+        <li>📊 Reportes de tu impacto ambiental</li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Plataforma de Reciclaje y Recompensas</p>
+  </footer>
+</body>
+</html>

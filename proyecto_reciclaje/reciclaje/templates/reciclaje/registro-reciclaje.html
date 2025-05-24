@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Registrar Reciclaje</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+</head>
+
+<body class="form-body">
+  <div class="form-container">
+    <h2>Registrar Material Reciclado</h2>
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <form action="{% url 'registro_reciclaje' %}" method="post" class="reciclaje-form">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" name="fecha" required>
+      </div>
+
+      <div class="form-group">
+        <label for="tipo">Tipo de Material</label>
+        <select id="tipo" name="tipo" required>
+          <option value="">Seleccione</option>
+          <option value="plastico">Plástico (sin reciduos)</option>
+          <option value="papel">Papel</option>
+          <option value="vidrio">Vidrio</option>
+          <option value="metal">Metal</option>
+          <option value="otros">Otros</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="cantidad">Cantidad (kg)</label>
+        <input type="number" step="0.1" min="0.1" id="cantidad" name="cantidad" placeholder="Ej. 2.5" required>
+      </div>
+
+      <button type="submit" class="submit-btn">Registrar</button>
+    </form>
+  </div>
+</body>
+</html>
