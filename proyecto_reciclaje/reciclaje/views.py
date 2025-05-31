@@ -7,6 +7,75 @@ from datetime import datetime
 def inicio(request):
     return render(request, 'reciclaje/inicio.html')
 
+def donacion(request):
+    id_usuario = request.session.get('id_usuario')
+    if not id_usuario:
+        messages.error(request, 'Debes iniciar sesión para ver las donaciones.')
+        return redirect('login')
+
+    nombre_usuario = ""
+    donaciones = []
+    try:
+        with connection.cursor() as cursor:
+            # Obtener el nombre del usuario
+            cursor.execute(
+                "SELECT nombre FROM Usuario WHERE id_usuario = %s",
+                [id_usuario]
+            )
+            result = cursor.fetchone()
+            nombre_usuario = result[0] if result else "Usuario"
+
+            # Cargar las donaciones disponibles
+            cursor.execute(
+                """
+                SELECT id_donacion, nombre, entidad_donacion, monto_donacion
+                FROM Donacion
+                """
+            )
+            donaciones = cursor.fetchall()
+
+        # Manejar el canje de donaciones
+        if request.method == 'POST':
+            id_donacion = request.POST.get('id_donacion')
+            cantidad = int(request.POST.get('cantidad', 1))
+            fecha_canje = timezone.now().date()
+
+            try:
+                with connection.cursor() as cursor:
+                    cursor.execute(
+                        "SELECT monto_donacion FROM Donacion WHERE id_donacion = %s",
+                        [id_donacion]
+                    )
+                    result = cursor.fetchone()
+                    if not result:
+                        raise Exception("ID de donación no válido.")
+                    monto_por_unidad = float(result[0])
+                    puntos_totales = monto_por_unidad * cantidad
+
+                    cursor.callproc('canjear_donacion', [
+                        int(id_usuario),
+                        int(id_donacion),
+                        cantidad,
+                        'Completado',
+                        fecha_canje
+                    ])
+                    connection.commit()
+                    messages.success(request, f'Donación realizada con éxito. Puntos descontados: {puntos_totales} (equivalente a {puntos_totales} Bs.)')
+            except Exception as e:
+                messages.error(request, f'Error al realizar la donación: {str(e)}')
+                connection.rollback()
+
+            return redirect('donacion')
+
+    except Exception as e:
+        messages.error(request, f'Error al cargar donaciones: {str(e)}')
+        print(f"Error en donacion: {str(e)}")
+
+    return render(request, 'reciclaje/donacion.html', {
+        'nombre_usuario': nombre_usuario,
+        'donaciones': donaciones
+    })
+
 def catalogo(request):
     id_usuario = request.session.get('id_usuario')
     if not id_usuario:
@@ -28,30 +97,37 @@ def catalogo(request):
             # Cargar las recompensas del catálogo
             cursor.execute(
                 """
-                SELECT id_catalogo_recompensa, nombre, puntos_coste, stock, 
-                       COALESCE(imagen, %s) AS imagen
+                SELECT id_catalogo_recompensa, nombre, puntos_coste, stock
                 FROM Catalogo_Recompensa
                 WHERE disponible = TRUE AND stock > 0
-                """,
-                ['/static/img/reciclar-senal.png']
+                """
             )
             catalogo = cursor.fetchall()
 
         # Manejar el canje de recompensas
         if request.method == 'POST':
             id_catalogo = request.POST.get('id_catalogo')
+            cantidad = int(request.POST.get('cantidad', 1))  # Añadimos la cantidad
             fecha_canje = timezone.now().date()
 
             try:
                 with connection.cursor() as cursor:
+                    # Obtener el costo por unidad para el mensaje
+                    cursor.execute(
+                        "SELECT puntos_coste FROM Catalogo_Recompensa WHERE id_catalogo_recompensa = %s",
+                        [id_catalogo]
+                    )
+                    puntos_por_unidad = float(cursor.fetchone()[0])
+                    puntos_totales = puntos_por_unidad * cantidad
+
                     cursor.callproc('canjear_recompensa', [
                         int(id_usuario),
                         int(id_catalogo),
-                        'Completado',  # Estado fijo por ahora
+                        'Completado',
                         fecha_canje
                     ])
                     connection.commit()
-                    messages.success(request, 'Recompensa canjeada con éxito.')
+                    messages.success(request, f'Recompensa canjeada con éxito. Puntos descontados: {puntos_totales}.')
             except Exception as e:
                 messages.error(request, f'Error al canjear recompensa: {str(e)}')
                 connection.rollback()
@@ -338,21 +414,155 @@ def admin_usuarios(request):
         return redirect('dashboard')
 
     usuarios = []
+    roles = []
+    permisos = []
     try:
         with connection.cursor() as cursor:
+            if request.method == 'POST':
+                # Manejar la actualización del usuario
+                id_usuario = request.POST.get('id_usuario')
+                rol_seleccionado = request.POST.get('rol')
+                permisos_seleccionados = request.POST.get('permisos', '').split(',')
+
+                try:
+                    # Obtener el id del rol seleccionado
+                    cursor.execute("SELECT id_rol FROM Rol WHERE nombre = %s", [rol_seleccionado])
+                    selected_rol_id_result = cursor.fetchone()
+                    if not selected_rol_id_result:
+                        raise Exception(f"Rol '{rol_seleccionado}' no encontrado.")
+                    selected_rol_id = selected_rol_id_result[0]
+
+                    # Actualizar el rol del usuario
+                    cursor.execute(
+                        """
+                        UPDATE Usuario SET id_rol = %s WHERE id_usuario = %s
+                        """,
+                        [selected_rol_id, id_usuario]
+                    )
+
+                    # Eliminar permisos personalizados antiguos del usuario
+                    cursor.execute("DELETE FROM Usuario_Permiso WHERE id_usuario = %s", [id_usuario])
+
+                    # Asignar nuevos permisos personalizados al usuario
+                    for permiso in permisos_seleccionados:
+                        if permiso:  # Ignorar cadenas vacías
+                            cursor.execute(
+                                "SELECT id_permiso FROM Permiso WHERE nombre = %s",
+                                [permiso]
+                            )
+                            id_permiso_result = cursor.fetchone()
+                            if id_permiso_result:
+                                id_permiso = id_permiso_result[0]
+                                cursor.execute(
+                                    "INSERT INTO Usuario_Permiso (id_usuario, id_permiso) VALUES (%s, %s)",
+                                    [id_usuario, id_permiso]
+                                )
+
+                    connection.commit()
+                    messages.success(request, "Usuario actualizado correctamente.")
+                except Exception as e:
+                    connection.rollback()
+                    messages.error(request, f"Error al actualizar usuario: {str(e)}")
+                    print(f"Error al actualizar usuario: {str(e)}")
+
+                response = redirect('admin_usuarios')
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
+                return response
+
+            # Obtener lista de usuarios
             cursor.execute(
                 """
-                SELECT id_usuario, nombre, correo, telefono, balance_puntos, contraseña, 
-                       DATE_FORMAT(fecha_registro, '%%d/%%m/%%Y') AS fecha_registro
-                FROM Usuario
+                SELECT 
+                    u.id_usuario,
+                    u.nombre,
+                    u.correo,
+                    u.telefono,
+                    u.balance_puntos,
+                    u.contraseña,
+                    DATE_FORMAT(u.fecha_registro, '%d/%m/%Y') AS fecha_registro,
+                    r.nombre AS rol
+                FROM Usuario u
+                JOIN Rol r ON u.id_rol = r.id_rol
                 """
             )
-            usuarios = cursor.fetchall()
+            usuarios_raw = cursor.fetchall()
+
+            # Obtener permisos para cada usuario
+            usuarios = []
+            for usuario in usuarios_raw:
+                id_usuario = usuario[0]
+                id_rol = None
+                cursor.execute("SELECT id_rol FROM Usuario WHERE id_usuario = %s", [id_usuario])
+                id_rol_result = cursor.fetchone()
+                if id_rol_result:
+                    id_rol = id_rol_result[0]
+
+                # Obtener permisos personalizados del usuario (Usuario_Permiso)
+                cursor.execute(
+                    """
+                    SELECT p.nombre
+                    FROM Usuario_Permiso up
+                    JOIN Permiso p ON up.id_permiso = p.id_permiso
+                    WHERE up.id_usuario = %s
+                    """,
+                    [id_usuario]
+                )
+                permisos_personalizados = [row[0] for row in cursor.fetchall()]
+
+                # Si el usuario no tiene permisos personalizados, usar los permisos base del rol
+                permisos_mostrar = permisos_personalizados
+                if not permisos_personalizados:
+                    cursor.execute(
+                        """
+                        SELECT p.nombre
+                        FROM Rol_Permiso rp
+                        JOIN Permiso p ON rp.id_permiso = p.id_permiso
+                        WHERE rp.id_rol = %s
+                        """,
+                        [id_rol]
+                    )
+                    permisos_mostrar = [row[0] for row in cursor.fetchall()]
+
+                permisos_str = ", ".join(permisos_mostrar) if permisos_mostrar else ""
+                rol_permisos = f"{usuario[7]}: {permisos_str}" if permisos_str else usuario[7]
+                usuario_con_permiso = usuario[:7] + (rol_permisos,)
+                usuarios.append(usuario_con_permiso)
+
+            # Obtener lista de roles disponibles
+            cursor.execute("SELECT nombre FROM Rol")
+            roles = [row[0] for row in cursor.fetchall()]
+
+            # Obtener lista de permisos disponibles
+            cursor.execute("SELECT nombre FROM Permiso")
+            permisos = [row[0] for row in cursor.fetchall()]
+
+            # Permitir añadir nuevos permisos o roles si se envían desde el formulario
+            nuevo_permiso = request.POST.get('nuevo_permiso')
+            nuevo_rol = request.POST.get('nuevo_rol')
+            if nuevo_permiso and request.method == 'POST':
+                cursor.execute("SELECT nombre FROM Permiso WHERE nombre = %s", [nuevo_permiso])
+                if not cursor.fetchone():
+                    cursor.execute("INSERT INTO Permiso (nombre) VALUES (%s)", [nuevo_permiso])
+                    connection.commit()
+                    permisos.append(nuevo_permiso)
+            if nuevo_rol and request.method == 'POST':
+                cursor.execute("SELECT nombre FROM Rol WHERE nombre = %s", [nuevo_rol])
+                if not cursor.fetchone():
+                    cursor.callproc('insertar_rol', [nuevo_rol, ''])
+                    connection.commit()
+                    roles.append(nuevo_rol)
+
     except Exception as e:
-        messages.error(request, f'Error al cargar usuarios: {str(e)}')
+        messages.error(request, f"Error al cargar usuarios: {str(e)}")
         print(f"Error en admin_usuarios: {str(e)}")
 
-    return render(request, 'reciclaje/usuarios.html', {'usuarios': usuarios})
+    return render(request, 'reciclaje/admin_usuarios.html', {
+        'usuarios': usuarios,
+        'roles': roles,
+        'permisos': permisos
+    })
 
 def admin_registros(request):
     if not es_admin(request):
@@ -365,8 +575,7 @@ def admin_registros(request):
             cursor.execute(
                 """
                 SELECT id_registro_reciclaje, id_usuario, id_punto_reciclaje, cantidad_kg, 
-                       puntos_obtenidos, co2_reducido, 
-                       DATE_FORMAT(fecha_registro, '%%d/%%m/%%Y') AS fecha_registro, 
+                       puntos_obtenidos, co2_reducido, fecha_registro, 
                        nombre_subtipo
                 FROM Registro_Reciclaje
                 """
@@ -383,22 +592,178 @@ def admin_catalogo(request):
         messages.error(request, 'No tienes permisos para acceder a esta página.')
         return redirect('dashboard')
 
-    catalogo = []
+    recompensas = []
     try:
         with connection.cursor() as cursor:
+            if request.method == 'POST':
+                # Manejar la actualización o eliminación de la recompensa
+                action = request.POST.get('action')
+                id_recompensa = request.POST.get('id_recompensa')
+                if action == 'delete':
+                    try:
+                        cursor.execute(
+                            "DELETE FROM Catalogo_Recompensa WHERE id_catalogo_recompensa = %s",
+                            [id_recompensa]
+                        )
+                        connection.commit()
+                        messages.success(request, "Recompensa eliminada correctamente.")
+                    except Exception as e:
+                        connection.rollback()
+                        messages.error(request, f"Error al eliminar recompensa: {str(e)}")
+                        print(f"Error al eliminar recompensa: {str(e)}")
+                else:
+                    nombre = request.POST.get('nombre')
+                    puntos_coste = request.POST.get('puntos_coste')
+                    disponible = request.POST.get('disponible') == 'on'  # Checkbox
+                    stock = request.POST.get('stock')
+                    descuento = request.POST.get('descuento')
+                    categoria = request.POST.get('categoria')
+
+                    try:
+                        cursor.execute(
+                            """
+                            UPDATE Catalogo_Recompensa
+                            SET nombre = %s, puntos_coste = %s, disponible = %s, stock = %s, descuento = %s, categoria = %s
+                            WHERE id_catalogo_recompensa = %s
+                            """,
+                            [nombre, puntos_coste, disponible, stock, descuento, categoria, id_recompensa]
+                        )
+                        connection.commit()
+                        messages.success(request, "Recompensa actualizada correctamente.")
+                    except Exception as e:
+                        connection.rollback()
+                        messages.error(request, f"Error al actualizar recompensa: {str(e)}")
+                        print(f"Error al actualizar recompensa: {str(e)}")
+
+                response = redirect('admin_catalogo')
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
+                return response
+
+            # Obtener lista de recompensas
             cursor.execute(
                 """
-                SELECT id_catalogo_recompensa, nombre, coste_puntos, stock, imagen
+                SELECT 
+                    id_catalogo_recompensa,  -- Ajustar según la clave primaria real
+                    nombre,
+                    puntos_coste,
+                    disponible,
+                    stock,
+                    descuento,
+                    categoria
                 FROM Catalogo_Recompensa
                 """
             )
-            catalogo = cursor.fetchall()
+            recompensas = cursor.fetchall()
+
     except Exception as e:
-        messages.error(request, f'Error al cargar catálogo: {str(e)}')
+        messages.error(request, f"Error al cargar recompensas: {str(e)}")
         print(f"Error en admin_catalogo: {str(e)}")
 
-    return render(request, 'reciclaje/catalogo.html', {'catalogo': catalogo})
+    return render(request, 'reciclaje/admin_catalogo.html', {
+        'recompensas': recompensas
+    })
 
+def admin_donacion(request):
+    if not es_admin(request):
+        messages.error(request, 'No tienes permisos para acceder a esta página.')
+        return redirect('dashboard')
+
+    donaciones = []
+    try:
+        with connection.cursor() as cursor:
+            if request.method == 'POST':
+                # Manejar la actualización, eliminación o creación
+                action = request.POST.get('action')
+                id_donacion = request.POST.get('id_donacion')
+                if action == 'delete':
+                    try:
+                        cursor.execute(
+                            "DELETE FROM Donacion WHERE id_donacion = %s",  # Ajustar según la clave primaria real
+                            [id_donacion]
+                        )
+                        connection.commit()
+                        messages.success(request, "Donación eliminada correctamente.")
+                    except Exception as e:
+                        connection.rollback()
+                        messages.error(request, f"Error al eliminar donación: {str(e)}")
+                        print(f"Error al eliminar donación: {str(e)}")
+                elif action == 'add':
+                    nombre = request.POST.get('nombre')
+                    puntos_coste = request.POST.get('puntos_coste')
+                    disponible = request.POST.get('disponible') == 'on'
+                    stock = request.POST.get('stock')
+                    descuento = request.POST.get('descuento')
+                    categoria = request.POST.get('categoria')
+                    try:
+                        cursor.execute(
+                            """
+                            INSERT INTO Donacion (nombre, puntos_coste, disponible, stock, descuento, categoria)
+                            VALUES (%s, %s, %s, %s, %s, %s)
+                            """,
+                            [nombre, puntos_coste, disponible, stock, descuento, categoria]
+                        )
+                        connection.commit()
+                        messages.success(request, "Donación añadida correctamente.")
+                    except Exception as e:
+                        connection.rollback()
+                        messages.error(request, f"Error al añadir donación: {str(e)}")
+                        print(f"Error al añadir donación: {str(e)}")
+                else:
+                    nombre = request.POST.get('nombre')
+                    puntos_coste = request.POST.get('puntos_coste')
+                    disponible = request.POST.get('disponible') == 'on'
+                    stock = request.POST.get('stock')
+                    descuento = request.POST.get('descuento')
+                    categoria = request.POST.get('categoria')
+                    try:
+                        cursor.execute(
+                            """
+                            UPDATE Donacion
+                            SET nombre = %s, puntos_coste = %s, disponible = %s, stock = %s, descuento = %s, categoria = %s
+                            WHERE id_donacion = %s
+                            """,
+                            [nombre, puntos_coste, disponible, stock, descuento, categoria, id_donacion]
+                        )
+                        connection.commit()
+                        messages.success(request, "Donación actualizada correctamente.")
+                    except Exception as e:
+                        connection.rollback()
+                        messages.error(request, f"Error al actualizar donación: {str(e)}")
+                        print(f"Error al actualizar donación: {str(e)}")
+
+                response = redirect('admin_donacion')
+                response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                response['Pragma'] = 'no-cache'
+                response['Expires'] = '0'
+                return response
+
+            # Obtener lista de donaciones
+            cursor.execute(
+                """
+                SELECT 
+                    id_donacion,  -- Ajustar según la clave primaria real
+                    nombre,
+                    puntos_coste,
+                    disponible,
+                    stock,
+                    descuento,
+                    categoria
+                FROM Donacion
+                """
+            )
+            donaciones = cursor.fetchall()
+
+    except Exception as e:
+        messages.error(request, f"Error al cargar donaciones: {str(e)}")
+        print(f"Error en admin_donacion: {str(e)}")
+
+    return render(request, 'reciclaje/admin_donacion.html', {
+        'donacion': donaciones
+    })
+
+    
 def admin_historial(request):
     if not es_admin(request):
         messages.error(request, 'No tienes permisos para acceder a esta página.')

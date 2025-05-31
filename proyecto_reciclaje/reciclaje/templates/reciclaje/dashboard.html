@@ -3,26 +3,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Usuario</title>
+  {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 </head>
+
 <body class="dashboard-body">
-  <header class="dashboard-header">
+<header class="dashboard-header">
     <h1>Bienvenido, {{ nombre_usuario }}</h1>
     <nav>
-      <a href="{% url 'dashboard' %}">Dashboard</a>
-      <a href="{% url 'registro_reciclaje' %}">Registrar Reciclaje</a>
-      <a href="{% url 'catalogo' %}">Catálogo</a>
-      <a href="{% url 'historial' %}">Historial</a>
-      {% if es_admin %}
-        <a href="{% url 'admin_panel' %}">Panel de Administración</a>
-      {% endif %}
-      <a href="{% url 'logout' %}">Cerrar Sesión</a>
+        <a href="{% url 'dashboard' %}">Dashboard</a>
+        <a href="{% url 'registro_reciclaje' %}">Registrar Reciclaje</a>
+        <a href="{% url 'catalogo' %}">Catálogo</a>
+        <a href="{% url 'donacion' %}">Donacion</a>
+        <a href="{% url 'historial' %}">Historial</a>
+        {% if es_admin %}
+            <a href="{% url 'admin_panel' %}">Panel de Administración</a>
+        {% endif %}
+        <a href="{% url 'logout' %}">Cerrar Sesión</a>
     </nav>
-  </header>
+</header>
 
-  <main class="dashboard-main">
+<main class="dashboard-main">
     {% if messages %}
       {% for message in messages %}
         <div class="error-message {{ message.tags }}">{{ message }}</div>
@@ -39,38 +42,42 @@
         <p>{{ puntos_acumulados }}</p>
       </div>
       <div class="card">
-        <h3>CO2 Reducido</h3>
+        <h3>CO₂ Reducido</h3>
         <p>{{ co2_reducido }} kg</p>
       </div>
     </section>
 
     <section class="recent-activity">
       <h2>Últimas Actividades</h2>
-      <table class="recycling-table">
-        <thead>
-          <tr>
-            <th>Fecha</th>
-            <th>Material</th>
-            <th>Cantidad (kg)</th>
-            <th>Puntos</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for actividad in ultimas_actividades %}
+      <div class="tabla-scroll">
+        <table>
+          <thead>
             <tr>
-              <td>{{ actividad.0 }}</td>
-              <td>{{ actividad.1 }}</td>
-              <td>{{ actividad.2 }}</td>
-              <td>{{ actividad.3 }}</td>
+              <th>Fecha</th>
+              <th>Material</th>
+              <th>Cantidad</th>
+              <th>Puntos</th>
             </tr>
-          {% empty %}
-            <tr>
-              <td colspan="4">No hay actividades recientes.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {% for actividad in ultimas_actividades %}
+              <tr>
+                <td>{{ actividad.0 }}</td>
+                <td>{{ actividad.1 }}</td>
+                <td>{{ actividad.2 }}</td>
+                <td>{{ actividad.3 }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="4">No hay actividades recientes.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
     </section>
-  </main>
+</main>
+
+<script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </body>
 </html>

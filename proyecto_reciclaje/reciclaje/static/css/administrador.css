@@ -1,0 +1,767 @@
+.dashboard-body {
+    font-family: sans-serif;
+    background-color: #f4fdf4;
+    margin: 0;
+}
+
+.dashboard-header {
+background-color: #2e7d32;
+color: white;
+padding: 1em 2em;
+display: flex;
+flex-direction: column;
+align-items: center;
+}
+
+.dashboard-header h1 {
+margin: 0.2em 0;
+}
+
+.dashboard-header nav ul {
+list-style: none;
+padding: 0;
+display: flex;
+gap: 1em;
+}
+
+.dashboard-header nav a {
+color: white;
+text-decoration: none;
+font-weight: bold;
+}
+
+.dashboard-main {
+padding: 2em;
+}
+
+.admin-panel {
+display: grid;
+grid-template-rows: repeat(auto-fit, minmax(280px, 1fr));
+gap: 2em;
+margin-top: 2em;
+}
+
+.admin-card {
+background-color: #ffffff;
+border-radius: 12px;
+padding: 1.5em;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+text-align: center;
+}
+
+.admin-card h2 {
+margin-bottom: 0.5em;
+color: #4caf50;
+}
+
+.admin-btn {
+display: inline-block;
+margin-top: 1em;
+padding: 0.6em 1.2em;
+background-color: #4caf50;
+color: white;
+text-decoration: none;
+border-radius: 8px;
+transition: background-color 0.3s ease;
+}
+
+.admin-btn:hover {
+background-color: #43a047;
+}
+.tabla-usuarios {
+padding: 2em;
+background-color: #f4fdf4;
+}
+
+.tabla-usuarios h2 {
+color: #2e7d32;
+margin-bottom: 1em;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+background-color: #fff;
+box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+border-radius: 10px;
+overflow: hidden;
+}
+
+thead {
+background-color: #a5d6a7;
+color: #1b5e20;
+}
+
+th, td {
+padding: 1em;
+text-align: center;
+border: 1px solid #ddd;
+}
+
+td {
+color: #333;
+}
+
+.edit-btn, .delete-btn {
+border: none;
+padding: 0.5em 1em;
+margin: 0 0.2em;
+border-radius: 6px;
+cursor: pointer;
+font-weight: bold;
+}
+
+.edit-btn {
+background-color: #4caf50;
+color: white;
+}
+
+.delete-btn {
+background-color: #e53935;
+color: white;
+}
+
+.edit-btn:hover {
+background-color: #388e3c;
+}
+
+.delete-btn:hover {
+background-color: #c62828;
+}
+.imagen-tabla{
+max-width: 50px;
+}
+a{
+    padding: 15px;
+}
+#lista-bitacora {
+    background-color: #4caf50;
+    color: white;
+    padding: 0.5em 1em;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    margin-top: 0.5em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+  }
+  
+#lista-bitacora:hover {
+    background-color: #388e3c;
+}
+#lista-bitacora-menu {
+    background-color: #2e7d32;
+    color: white;
+    padding: 0.5em 1em;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    margin-top: 0.5em;
+  }
+  
+  /* Estilo para el contenido del modal */
+/* Estilo para el modal */
+.admin-usuarios-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-usuarios-modal.active {
+    display: flex;
+}
+
+/* Estilo para el contenido del modal */
+.admin-usuarios-modal-content {
+    background-color: #ffffff;
+    padding: 25px; /* Aumentamos el padding general */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px; /* Aumentamos el ancho para más espacio */
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    text-align: left; /* Alineación a la izquierda para mejor lectura */
+    font-size: 16px; /* Tamaño de fuente base */
+    line-height: 1.5; /* Espaciado entre líneas */
+}
+
+/* Estilo para el título del modal */
+.admin-usuarios-modal-content h2 {
+    margin-bottom: 20px; /* Espacio debajo del título */
+    font-size: 24px; /* Tamaño de fuente más grande para el título */
+    color: #333; /* Color oscuro para contraste */
+}
+
+/* Estilo para etiquetas y campos */
+.admin-usuarios-modal-content label {
+    display: block; /* Cada etiqueta en una nueva línea */
+    margin-bottom: 5px; /* Espacio debajo de la etiqueta */
+    font-weight: bold; /* Negrita para destacar etiquetas */
+    color: #444; /* Color intermedio para contraste */
+}
+
+.admin-usuarios-modal-content select,
+.admin-usuarios-modal-content input[type="text"] {
+    width: 100%; /* Ancho completo del contenedor */
+    padding: 10px; /* Más padding interno */
+    margin-bottom: 15px; /* Espacio debajo de cada campo */
+    border: 1px solid #ccc; /* Borde sutil */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 14px; /* Tamaño de fuente consistente */
+    box-sizing: border-box; /* Incluir padding y borde en el ancho */
+}
+
+/* Estilo para los botones de añadir */
+.admin-usuarios-add-rol-btn,
+.admin-usuarios-add-permiso-btn {
+    background-color: #2196F3;
+    color: white;
+    padding: 10px 15px; /* Más padding para los botones */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-left: 10px; /* Espacio a la izquierda del botón */
+    transition: background-color 0.3s ease;
+}
+
+.admin-usuarios-add-rol-btn:hover,
+.admin-usuarios-add-permiso-btn:hover {
+    background-color: #1976D2;
+}
+
+/* Estilo para la lista de permisos */
+.admin-usuarios-permisos-list {
+    margin-top: 15px; /* Espacio encima de la lista */
+    margin-bottom: 20px; /* Espacio debajo de la lista */
+}
+
+.admin-usuarios-permiso-tag {
+    display: inline-block;
+    background-color: #f0f0f0; /* Fondo claro para las etiquetas */
+    padding: 8px 12px; /* Más padding interno */
+    margin-right: 10px; /* Espacio entre etiquetas */
+    margin-bottom: 10px; /* Espacio entre filas de etiquetas */
+    border-radius: 15px; /* Bordes más redondeados */
+    font-size: 14px;
+    color: #333;
+}
+
+.admin-usuarios-permiso-remove {
+    cursor: pointer;
+    color: #ff4d4d;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 50%;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    margin-left: 5px; /* Espacio entre el texto y la "X" */
+}
+
+.admin-usuarios-permiso-remove:hover {
+    color: #ffffff;
+    background-color: #d32f2f;
+}
+
+/* Estilo para el botón de guardar */
+.admin-usuarios-save-btn {
+    background-color: #4CAF50; /* Verde para guardar */
+    color: white;
+    padding: 12px 20px; /* Más padding para destacar */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%; /* Ancho completo */
+    margin-top: 20px; /* Espacio encima del botón */
+}
+
+.admin-usuarios-save-btn:hover {
+    background-color: #45a049;
+}
+
+/* Estilo para el botón de cierre */
+.admin-usuarios-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.admin-usuarios-close-btn:hover {
+    color: #000;
+}
+
+.admin-catalogo-body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo para el main */
+.admin-catalogo-main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para los mensajes */
+.admin-catalogo-message {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.admin-catalogo-message-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.admin-catalogo-message-error {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Estilo para el título */
+.admin-catalogo-main h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Estilo para el contenedor de la tabla */
+.admin-catalogo-table-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Estilo para la tabla */
+.admin-catalogo-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.admin-catalogo-table th,
+.admin-catalogo-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-catalogo-table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.admin-catalogo-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilo para la imagen */
+.admin-catalogo-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+/* Estilo para el botón de edición */
+.admin-catalogo-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #2196F3;
+}
+
+.admin-catalogo-edit-btn:hover {
+    color: #1976D2;
+}
+
+/* Estilo para el modal */
+.admin-catalogo-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-catalogo-modal.active {
+    display: flex;
+}
+
+/* Estilo para el contenido del modal */
+.admin-catalogo-modal-content {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Estilo para el título del modal */
+.admin-catalogo-modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Estilo para etiquetas y campos */
+.admin-catalogo-modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #444;
+}
+
+.admin-catalogo-modal-content input[type="text"],
+.admin-catalogo-modal-content input[type="number"],
+.admin-catalogo-modal-content textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.admin-catalogo-modal-content textarea {
+    resize: vertical; /* Permitir redimensionar solo verticalmente */
+}
+
+/* Estilo para el botón de guardar */
+.admin-catalogo-save-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.admin-catalogo-save-btn:hover {
+    background-color: #45a049;
+}
+
+/* Estilo para el botón de cierre */
+.admin-catalogo-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.admin-catalogo-close-btn:hover {
+    color: #000;
+}
+
+
+
+
+
+.admin-catalogo-add-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.admin-catalogo-add-btn {
+    background: linear-gradient(to right, #4CAF50, #45a049);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.admin-catalogo-add-btn:hover {
+    background: linear-gradient(to right, #45a049, #388E3C);
+}
+
+/* Estilo para el botón de eliminar */
+.admin-catalogo-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #f44336;
+    margin-left: 10px;
+}
+
+.admin-catalogo-delete-btn:hover {
+    color: #d32f2f;
+}
+
+.admin-donacion-body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+/* Estilo para el main */
+.admin-donacion-main {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo para los mensajes */
+.admin-donacion-message {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+}
+
+.admin-donacion-message-success {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.admin-donacion-message-error {
+    background-color: #f44336;
+    color: white;
+}
+
+/* Estilo para el título */
+.admin-donacion-main h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Estilo para el contenedor de la tabla */
+.admin-donacion-table-scroll {
+    max-height: 400px;
+    overflow-y: auto;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+/* Estilo para la tabla */
+.admin-donacion-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+.admin-donacion-table th,
+.admin-donacion-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.admin-donacion-table th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.admin-donacion-table tr:hover {
+    background-color: #f1f1f1;
+}
+
+/* Estilo para el botón de edición */
+.admin-donacion-edit-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #2196F3;
+}
+
+.admin-donacion-edit-btn:hover {
+    color: #1976D2;
+}
+
+/* Estilo para el botón de eliminar */
+.admin-donacion-delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #f44336;
+    margin-left: 10px;
+}
+
+.admin-donacion-delete-btn:hover {
+    color: #d32f2f;
+}
+
+/* Estilo para el contenedor del botón de añadir */
+.admin-donacion-add-button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.admin-donacion-add-btn {
+    background: linear-gradient(to right, #4CAF50, #45a049);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s ease;
+}
+
+.admin-donacion-add-btn:hover {
+    background: linear-gradient(to right, #45a049, #388E3C);
+}
+
+/* Estilo para el modal */
+.admin-donacion-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.admin-donacion-modal.active {
+    display: flex;
+}
+
+/* Estilo para el contenido del modal */
+.admin-donacion-modal-content {
+    background-color: #ffffff;
+    padding: 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    text-align: left;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+/* Estilo para el título del modal */
+.admin-donacion-modal-content h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+/* Estilo para etiquetas y campos */
+.admin-donacion-modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #444;
+}
+
+.admin-donacion-modal-content input[type="text"],
+.admin-donacion-modal-content input[type="number"],
+.admin-donacion-modal-content textarea,
+.admin-donacion-modal-content select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.admin-donacion-modal-content textarea {
+    resize: vertical;
+}
+
+/* Estilo para el botón de guardar */
+.admin-donacion-save-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.admin-donacion-save-btn:hover {
+    background-color: #45a049;
+}
+
+/* Estilo para el botón de cierre */
+.admin-donacion-close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.admin-donacion-close-btn:hover {
+    color: #000;
+}

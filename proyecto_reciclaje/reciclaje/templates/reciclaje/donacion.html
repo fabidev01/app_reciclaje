@@ -4,14 +4,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Catálogo de Recompensas</title>
+    <title>Donaciones</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 </head>
 
 <body class="dashboard-body">
 <header class="dashboard-header">
-    <h1 class="titulo">Bienvenido, {{ nombre_usuario }}</h1>
+    <h1>Bienvenido, {{ nombre_usuario }}</h1>
     <nav>
         <a href="{% url 'dashboard' %}">Dashboard</a>
         <a href="{% url 'registro_reciclaje' %}">Registrar Reciclaje</a>
@@ -25,9 +25,8 @@
     </nav>
 </header>
 
-<!-- Contenido principal -->
-<main class="tabla-usuarios">
-    <h2>Catálogo de Recompensas</h2>
+<main class="tabla-donaciones">
+    <h2>Donaciones</h2>
     {% if messages %}
       {% for message in messages %}
         <div class="error-message {{ message.tags }}">{{ message }}</div>
@@ -39,41 +38,47 @@
             <thead>
                 <tr>
                     <th>Imagen</th>
-                    <th>Nombre</th>
-                    <th>Coste en Puntos</th>
-                    <th>Stock</th>
+                    <th>Entidad</th>
+                    <th>Tipo de Donación</th>
+                    <th>Costo por Unidad</th>
                     <th>Cantidad</th>
-                    <th>Canjear</th>
+                    <th>Acción</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in catalogo %}
+                {% for donacion in donaciones %}
                     <tr>
                         <td>
-                            <img class="imagen-tabla" src="{% static 'img/recompensa_'|add:item.0|add:'.jpeg' %}" alt="{{ item.1 }}" />
+                            <img class="imagen-tabla" src="{% static 'img/donacion_'|add:donacion.0|add:'.jpeg' %}" alt="{{ donacion.1 }}" />
                         </td>
-                        <td>{{ item.1 }}</td> <!-- Nombre -->
-                        <td>{{ item.2 }}</td> <!-- Puntos Coste -->
-                        <td>{{ item.3 }}</td> <!-- Stock -->
+                        <td>{{ donacion.2 }}</td> 
+                        <td>{{ donacion.1 }}</td>
                         <td>
+                            <div class="cost-container">
+                                <span class="cost-value">{{ donacion.3 }}</span>
+                                <span class="cost-unit">puntos</span>
+                                <span class="cost-equivalence">= {{ donacion.3 }} Bs.</span>
+                            </div>
+                        </td>
+                        <td style="display:flex; align-items:center; justify-content: center;">
                             <div class="cantidad-control">
-                              <button class="counter-btn" onclick="updateCount(this, 1)">+</button>
-                              <input type="number" class="count-input" value="1" min="1" onchange="syncCount(this)">
-                              <button class="counter-btn" onclick="updateCount(this, -1)">-</button>
+                                <button class="counter-btn" onclick="updateDonation(this, 1)">+</button>
+                                <input type="number" class="count-input" value="1" min="1" onchange="syncCount(this)">
+                                <button class="counter-btn" onclick="updateDonation(this, -1)">-</button>
                             </div>
                         </td>
                         <td>
-                            <form method="post" action="{% url 'catalogo' %}">
+                            <form method="post" action="{% url 'donacion' %}">
                                 {% csrf_token %}
-                                <input type="hidden" name="id_catalogo" value="{{ item.0 }}">
+                                <input type="hidden" name="id_donacion" value="{{ donacion.0 }}">
                                 <input type="hidden" name="cantidad" class="donation-quantity" value="1">
-                                <button type="submit" class="edit-btn">Canjear</button>
+                                <button type="submit" class="edit-btn">Canjear Pack</button>
                             </form>
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
-                        <td colspan="6">No hay recompensas en el catálogo.</td>
+                        <td colspan="6">No hay donaciones disponibles.</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -81,27 +86,25 @@
     </div>
 </main>
 
-<!-- Script para contador -->
 <script>
-    function updateCount(button, change) {
+    function updateDonation(button, change) {
         const row = button.closest('tr');
         const input = row.querySelector('.count-input');
         let count = parseInt(input.value);
         count += change;
         if (count < 1) count = 1;
         input.value = count;
-        row.querySelector('.donation-quantity').value = count; // Sincroniza el hidden input
+        row.querySelector('.donation-quantity').value = count; 
     }
 
     function syncCount(input) {
         let count = parseInt(input.value);
         if (isNaN(count) || count < 1) count = 1;
         input.value = count;
-        input.closest('tr').querySelector('.donation-quantity').value = count; // Sincroniza el hidden input
+        input.closest('tr').querySelector('.donation-quantity').value = count; 
     }
 </script>
 
-<!-- Iconos Ionicons -->
 <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
 </body>
 </html>

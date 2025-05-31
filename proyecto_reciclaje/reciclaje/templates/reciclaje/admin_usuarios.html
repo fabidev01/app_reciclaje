@@ -1,0 +1,202 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Usuarios</title>
+  <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+</head>
+<body class="dashboard-body">
+ <header class="dashboard-header">
+    <h1>Bienvenido, Admin</h1>
+    <nav>
+      <a href="{% url 'admin_panel' %}">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}">Ver Usuarios</a>
+      <a href="{% url 'admin_registros' %}">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
+      <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
+        <option value="#">Bitácoras ↓</option>
+        <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
+        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
+        <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
+      </select>
+      <a href="{% url 'dashboard' %}">Volver a Usuario</a>
+      <a href="{% url 'logout' %}">Cerrar Sesión</a>
+    </nav>
+  </header>
+
+<main class="admin-usuarios-main">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="admin-usuarios-message admin-usuarios-message-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <h2>Usuarios</h2>
+    <div class="admin-usuarios-table-scroll">
+      <table class="admin-usuarios-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Correo</th>
+            <th>Teléfono</th>
+            <th>Puntos</th>
+            <th>Contraseña</th>
+            <th>Fecha</th>
+            <th>Rol y Permisos</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for usuario in usuarios %}
+            <tr>
+              <td>{{ usuario.0 }}</td>
+              <td>{{ usuario.1 }}</td>
+              <td>{{ usuario.2 }}</td>
+              <td>{{ usuario.3 }}</td>
+              <td>{{ usuario.4 }}</td>
+              <td>{{ usuario.5 }}</td>
+              <td>{{ usuario.6 }}</td>
+              <td>{{ usuario.7 }}</td>
+              <td>
+                <button class="admin-usuarios-edit-btn" onclick="openEditModal('{{ usuario.0 }}', '{{ usuario.1 }}', '{{ usuario.7|escapejs }}')">✏️</button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="9">Sin usuarios.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- Modal para edición -->
+  <div id="adminUsuariosEditModal" class="admin-usuarios-modal">
+    <div class="admin-usuarios-modal-content">
+      <span class="admin-usuarios-close-btn" onclick="closeEditModal()">×</span>
+      <h2>Editar Rol y Permisos</h2>
+      <form id="adminUsuariosEditForm" method="post" action="{% url 'admin_usuarios' %}">
+        {% csrf_token %}
+        <input type="hidden" name="id_usuario" id="adminUsuariosEditId">
+        
+        <!-- Campo para el rol -->
+        <label for="adminUsuariosEditRol">Rol:</label>
+        <select name="rol" id="adminUsuariosEditRol" required>
+          {% for rol in roles %}
+            <option value="{{ rol }}">{{ rol }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="nuevo_rol" id="adminUsuariosNuevoRol" placeholder="Añadir nuevo rol..." />
+        <button type="button" class="admin-usuarios-add-rol-btn" onclick="addRol()">Añadir Rol</button>
+
+        <!-- Campo para los permisos -->
+        <label for="adminUsuariosAddPermiso">Añadir Permiso:</label>
+        <select id="adminUsuariosAddPermiso">
+          <option value="">Selecciona un permiso...</option>
+          {% for permiso in permisos %}
+            <option value="{{ permiso }}">{{ permiso }}</option>
+          {% endfor %}
+        </select>
+        <input type="text" name="nuevo_permiso" id="adminUsuariosNuevoPermiso" placeholder="Añadir nuevo permiso..." />
+        <button type="button" class="admin-usuarios-add-permiso-btn" onclick="addPermiso()">Añadir</button>
+
+        <!-- Lista de permisos seleccionados -->
+        <div id="adminUsuariosPermisosList" class="admin-usuarios-permisos-list"></div>
+
+        <!-- Campo oculto para enviar los permisos seleccionados -->
+        <input type="hidden" name="permisos" id="adminUsuariosPermisosHidden">
+
+        <button type="submit" class="admin-usuarios-save-btn">Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let permisosSeleccionados = [];
+
+    function openEditModal(id, nombre, rol_permisos) {
+      document.getElementById('adminUsuariosEditId').value = id;
+
+      // Preseleccionar el rol actual
+      const rolSelect = document.getElementById('adminUsuariosEditRol');
+      const rolActual = rol_permisos.split(': ')[0] || 'Usuario Regular';
+      rolSelect.value = rolActual;
+
+      // Cargar permisos actuales (solo los que se deben mostrar)
+      const permisosStr = rol_permisos.split(': ')[1] || '';
+      permisosSeleccionados = permisosStr ? permisosStr.split(', ').filter(p => p) : [];
+      updatePermisosList();
+
+      // Mostrar el modal
+      const modal = document.getElementById('adminUsuariosEditModal');
+      modal.classList.add('active');
+    }
+
+    function closeEditModal() {
+      const modal = document.getElementById('adminUsuariosEditModal');
+      modal.classList.remove('active');
+      permisosSeleccionados = [];
+      updatePermisosList();
+    }
+
+    function addRol() {
+      const nuevoRolInput = document.getElementById('adminUsuariosNuevoRol');
+      const nuevoRol = nuevoRolInput.value.trim();
+      if (nuevoRol && !document.getElementById('adminUsuariosEditRol').querySelector(`option[value="${nuevoRol}"]`)) {
+        const rolSelect = document.getElementById('adminUsuariosEditRol');
+        const option = document.createElement('option');
+        option.value = nuevoRol;
+        option.text = nuevoRol;
+        rolSelect.appendChild(option);
+        nuevoRolInput.value = ''; // Resetear el input
+      }
+    }
+
+    function addPermiso() {
+      const permisoSelect = document.getElementById('adminUsuariosAddPermiso');
+      const nuevoPermisoInput = document.getElementById('adminUsuariosNuevoPermiso');
+      let permiso = permisoSelect.value || nuevoPermisoInput.value.trim();
+      if (permiso && !permisosSeleccionados.includes(permiso)) {
+        permisosSeleccionados.push(permiso);
+        updatePermisosList();
+      }
+      permisoSelect.value = ''; // Resetear el select
+      nuevoPermisoInput.value = ''; // Resetear el input
+    }
+
+    function removePermiso(permiso) {
+      permisosSeleccionados = permisosSeleccionados.filter(p => p !== permiso);
+      updatePermisosList();
+    }
+
+    function updatePermisosList() {
+      const permisosList = document.getElementById('adminUsuariosPermisosList');
+      permisosList.innerHTML = '';
+      permisosSeleccionados.forEach(permiso => {
+        const tag = document.createElement('span');
+        tag.className = 'admin-usuarios-permiso-tag';
+        tag.innerHTML = `
+          ${permiso}
+          <span class="admin-usuarios-permiso-remove" onclick="removePermiso('${permiso}')">×</span>
+        `;
+        permisosList.appendChild(tag);
+      });
+
+      // Actualizar el campo oculto para enviar los permisos
+      document.getElementById('adminUsuariosPermisosHidden').value = permisosSeleccionados.join(',');
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('adminUsuariosEditModal');
+      if (event.target == modal) {
+        modal.classList.remove('active');
+        permisosSeleccionados = [];
+        updatePermisosList();
+      }
+    }
+  </script>
+</body>
+</html>

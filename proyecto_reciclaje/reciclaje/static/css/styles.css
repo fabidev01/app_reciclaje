@@ -1,4 +1,6 @@
 /* Estilos generales */
+
+
 h1{
   text-align: center;
 }
@@ -394,17 +396,6 @@ table td {
   -moz-appearance: none;
   margin-top: 0.5em;
 }
-
-/* Estilos de mensajes de error */
-.error-message {
-  color: #d32f2f;
-  background-color: #ffebee;
-  padding: 0.8em;
-  border-radius: 5px;
-  margin-bottom: 1em;
-  text-align: center;
-}
-
 .action-cell {
   text-align: center;
 }
@@ -421,4 +412,148 @@ table td {
 
 .canjear-btn:hover {
   background-color: #2e7d32;
+}
+
+/* Estilos de mensajes de error */
+.error-message {
+  color: #d32f2f;
+  background-color: #ffebee;
+  padding: 0.8em;
+  border-radius: 5px;
+  margin-bottom: 1em;
+  text-align: center;
+}
+/* Mensajes personalizados */
+.custom-messages {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-message {
+  padding: 12px 24px;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  opacity: 1;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  animation: slideDown 0.3s ease forwards;
+}
+
+/* Colores por tipo de mensaje */
+.custom-message.success{
+  background-color: #28a745; 
+}
+.custom-message.error {
+  background-color: #dc3545;
+}
+
+.custom-message.warning {
+  background-color: #ffc107; 
+  color: #000 !important;
+}
+.custom-message.info {
+  background-color: #17a2b8; 
+}
+
+.cost-container {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dfe6e9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.cost-container .cost-value {
+    font-weight: 600;
+    color: #2d3436;
+    font-size: 1.1em;
+}
+
+.cost-container .cost-unit {
+    font-size: 0.9em;
+    color: #636e72;
+    font-style: italic;
+}
+
+.cost-container .cost-equivalence {
+    font-size: 0.85em;
+    color: #00b894;
+    background-color: #e6fffa;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+
+
+/* Controles de cantidad */
+.cantidad-control {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.count-input {
+  width: 60px;
+  max-width: 80px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 2px;
+  font-size: 0.9em;
+  appearance: textfield;
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Quitar flechas */
+.count-input::-webkit-inner-spin-button,
+.count-input::-webkit-outer-spin-button {
+  display: none;
+}
+
+.counter-btn {
+  padding: 2px 6px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.counter-btn:hover {
+  background-color: #2980b9;
+}
+
+/* Estilo para tablas con scroll */
+.tabla-scroll {
+    max-height: 400px; 
+    overflow-y: auto; 
+    overflow-x: hidden; 
+    width: 100%; 
+}
+
+/* Asegurar que la tabla dentro de tabla-scroll sea responsiva */
+.tabla-scroll table {
+    width: 100%;
+    table-layout: auto; /* Ajustar columnas automáticamente */
+}
+
+/* Asegurar que el thead se mantenga fijo (opcional, para mejor UX) */
+.tabla-scroll thead {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background-color: #a5d6a7; /* Fondo del encabezado */
 }

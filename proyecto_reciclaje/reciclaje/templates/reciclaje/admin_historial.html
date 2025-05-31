@@ -5,7 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Historial de Acceso</title>
-  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
 <body class="dashboard-body">
   <header class="dashboard-header">
@@ -15,6 +15,7 @@
       <a href="{% url 'admin_usuarios' %}">Ver Usuarios</a>
       <a href="{% url 'admin_registros' %}">Ver Registros</a>
       <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
+      <a href="{% url 'admin_catalogo' %}">Ver Donaciones</a>
       <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
         <option value="#">Bitácoras ↓</option>
@@ -22,6 +23,7 @@
         <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
         <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
       </select>
+       <a href="{% url 'dashboard' %}">Volver a Usuario</a>
       <a href="{% url 'logout' %}">Cerrar Sesión</a>
     </nav>
   </header>
