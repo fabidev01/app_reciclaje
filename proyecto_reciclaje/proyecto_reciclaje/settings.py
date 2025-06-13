@@ -6,13 +6,14 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = [
+    'reciclaje',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'reciclaje',
+    
     
 ]
 
@@ -80,7 +81,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
+AUTHENTICATION_BACKENDS = [
+    'reciclaje.backends.UsuarioAuthBackend',
+    'django.contrib.auth.backends.ModelBackend',  # Mantén el predeterminado por si usas auth_user después
+]
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
@@ -103,3 +107,17 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',  # Cambia a 'DEBUG' para más detalles si es necesario
+    },
+}

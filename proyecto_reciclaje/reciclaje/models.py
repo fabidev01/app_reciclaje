@@ -322,18 +322,37 @@ class RolPermiso(models.Model):
         managed = False
         db_table = 'rol_permiso'
 
+class CustomUser(models.Model):
+    nombre = models.CharField(max_length=100)
+    correo = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+    balance_puntos = models.IntegerField(default=0)
+    fecha_registro = models.DateField(auto_now_add=True)
+    contraseña = models.CharField(max_length=128)  # Para el hash
+    ip = models.GenericIPAddressField(default='0.0.0.0')
+    id_rol = models.IntegerField(default=2)
+
+    def __str__(self):
+        return self.correo
+
+    class Meta:
+        managed = True  # Asegura que Django gestione esta tabla
+        db_table = 'usuario'  # Usa la tabla existente
 
 class Usuario(models.Model):
     id_usuario = models.AutoField(primary_key=True)
-    nombre = models.CharField(max_length=35)
-    correo = models.CharField(max_length=50)
-    telefono = models.CharField(max_length=10)
-    balance_puntos = models.IntegerField()
+    nombre = models.CharField(max_length=100)
+    correo = models.EmailField(unique=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
+    balance_puntos = models.IntegerField(default=0)
     fecha_registro = models.DateField()
-    contraseña = models.CharField(max_length=200)
-    ip = models.CharField(max_length=45)
-    id_rol = models.ForeignKey(Rol, models.DO_NOTHING, db_column='id_rol')
+    contraseña = models.CharField(max_length=128)  # Para hashes
+    ip = models.GenericIPAddressField(default='0.0.0.0')
+    id_rol = models.IntegerField(default=2)
 
     class Meta:
-        managed = False
-        db_table = 'usuario'
+        managed = False  # Indica que Django no gestione la creación/eliminar de esta tabla
+        db_table = 'usuario'  # Usa la tabla existente
+
+    def __str__(self):
+        return self.correo

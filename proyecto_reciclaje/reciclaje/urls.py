@@ -1,24 +1,25 @@
 # reciclaje/urls.py
 from django.urls import path
 from . import views
+from . import views_admin
 
 urlpatterns = [
-    path('', views.inicio, name='inicio'),  # Página de inicio
-    path('dashboard/', views.dashboard, name='dashboard'),  # Dashboard
-    path('historial/', views.historial, name='historial'),  # Historial
-    path('login/', views.login_view, name='login'),  # Login
-    path('login/', views.login_view, name='logout'),  # Loguot
-    path('registro-reciclaje/', views.registro_reciclaje, name='registro_reciclaje'),  # Registrar reciclaje
-    path('registro-usuario/', views.registro_usuario, name='registro_usuario'),  # Registro de usuario
-    path('catalogo/', views.catalogo, name='catalogo'),  # Recompensas
-    path('donacion/', views.donacion, name='donacion'),  # Recompensas
-    path('administrador/', views.admin_panel, name='admin_panel'),
-    path('administrador/usuarios/', views.admin_usuarios, name='admin_usuarios'),
-    path('administrador/registros/', views.admin_registros, name='admin_registros'),
-    path('administrador/catalogo/', views.admin_catalogo, name='admin_catalogo'),
-    path('administrador/donacion/', views.admin_donacion, name='admin_donacion'),
-    path('administrador/historial-acceso/', views.admin_historial, name='admin_historial'),
-    path('administrador/bitacora-reciclaje/', views.bitacora_reciclaje, name='bitacora_reciclaje'),
-    path('administrador/bitacora-catalogo/', views.bitacora_catalogo, name='bitacora_catalogo'),
-    path('administrador/bitacora-canje/', views.bitacora_canje, name='bitacora_canje'),
+    path('', views.inicio, name='inicio'),
+    path('login/', views.LoginView.as_view(), name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    path('registro-usuario/', views.registro_usuario, name='registro_usuario'),
+    path('donacion/', views.donacion, name='donacion'),
+    path('catalogo/', views.catalogo, name='catalogo'),
+    path('dashboard/', views.dashboard, name='dashboard'),
+    path('historial/', views.historial, name='historial'),
+    path('registro-reciclaje/', views.registro_reciclaje, name='registro_reciclaje'),
+    path('admin-panel/', views_admin.admin_panel, name='admin_panel'),
+    path('admin-usuarios/', views_admin.admin_usuarios, name='admin_usuarios'),
+    path('admin-registros/', views_admin.admin_registros, name='admin_registros'),
+    path('admin-catalogo/', views_admin.admin_catalogo, name='admin_catalogo'),
+    path('admin-donacion/', views_admin.admin_donacion, name='admin_donacion'),
+    path('admin-historial/', views_admin.admin_historial, name='admin_historial'),
+    path('bitacora-reciclaje/', views_admin.bitacora_reciclaje, name='bitacora_reciclaje'),
+    path('bitacora-catalogo/', views_admin.bitacora_catalogo, name='bitacora_catalogo'),
+    path('bitacora-canje/', views_admin.bitacora_canje, name='bitacora_canje'),
 ]

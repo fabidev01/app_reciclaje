@@ -15,7 +15,7 @@
       <a href="{% url 'admin_usuarios' %}">Ver Usuarios</a>
       <a href="{% url 'admin_registros' %}">Ver Registros</a>
       <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
-      <a href="{% url 'admin_catalogo' %}">Ver Donaciones</a>
+      <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
       <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
         <option value="#">Bitácoras ↓</option>
@@ -23,7 +23,6 @@
         <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
         <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
       </select>
-       <a href="{% url 'dashboard' %}">Volver a Usuario</a>
       <a href="{% url 'logout' %}">Cerrar Sesión</a>
     </nav>
   </header>
@@ -61,7 +60,7 @@
               <td>{{ donacion.6 }}</td>
               <td>
                 <button class="admin-donacion-edit-btn" onclick="openEditModal('{{ donacion.0 }}', '{{ donacion.1|escapejs }}', '{{ donacion.2 }}', {{ donacion.3|yesno:"true,false" }}, '{{ donacion.4 }}', '{{ donacion.5 }}', '{{ donacion.6|escapejs }}')">✏️</button>
-                <form method="post" action="{% url 'admin_donaciones' %}" style="display:inline;">
+                <form method="post" action="{% url 'admin_donacion' %}" style="display:inline;">
                   {% csrf_token %}
                   <input type="hidden" name="id_donacion" value="{{ donacion.0 }}">
                   <input type="hidden" name="action" value="delete">
@@ -84,7 +83,7 @@
       <div class="admin-donacion-modal-content">
         <span class="admin-donacion-close-btn" onclick="closeEditModal()">×</span>
         <h2>Editar Donación</h2>
-        <form id="adminDonacionEditForm" method="post" action="{% url 'admin_donaciones' %}">
+        <form id="adminDonacionEditForm" method="post" action="{% url 'admin_donacion' %}">
           {% csrf_token %}
           <input type="hidden" name="id_donacion" id="adminDonacionEditId">
 
@@ -126,7 +125,7 @@
       <div class="admin-donacion-modal-content">
         <span class="admin-donacion-close-btn" onclick="closeAddModal()">×</span>
         <h2>Añadir Donación</h2>
-        <form id="adminDonacionAddForm" method="post" action="{% url 'admin_donaciones' %}">
+        <form id="adminDonacionAddForm" method="post" action="{% url 'admin_donacion' %}">
           {% csrf_token %}
           <input type="hidden" name="action" value="add">
 

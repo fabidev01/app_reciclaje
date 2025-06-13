@@ -18,9 +18,6 @@
         <a href="{% url 'catalogo' %}">Catálogo</a>
         <a href="{% url 'donacion' %}">Donacion</a>
         <a href="{% url 'historial' %}">Historial</a>
-        {% if es_admin %}
-            <a href="{% url 'admin_panel' %}">Panel de Administración</a>
-        {% endif %}
         <a href="{% url 'logout' %}">Cerrar Sesión</a>
     </nav>
 </header>

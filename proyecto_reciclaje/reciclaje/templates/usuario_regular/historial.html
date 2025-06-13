@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  {% load static %}
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Historial de Reciclaje</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+  <script>
+    function updateHistoryType() {
+      var select = document.querySelector('.history-selector');
+      var url = "{% url 'historial' %}?type=" + select.value;
+      window.location.href = url;
+    }
+  </script>
+</head>
+
+<body class="dashboard-body">
+  <header class="dashboard-header">
+    <h1>Historial de Reciclaje</h1>
+    <nav>
+      <a href="{% url 'dashboard' %}">Dashboard</a>
+      <a href="{% url 'registro_reciclaje' %}">Registrar Reciclaje</a>
+      <a href="{% url 'catalogo' %}">Catálogo</a>
+      <a href="{% url 'donacion' %}">Donacion</a>
+      <a href="{% url 'historial' %}">Historial</a>
+      <a href="{% url 'logout' %}">Cerrar Sesión</a>
+    </nav>
+  </header>
+
+  <main class="dashboard-main">
+    <div class="history-selector-container">
+      <select class="history-selector" onchange="updateHistoryType()">
+        <option value="reciclajes" {% if selected_type == 'reciclajes' %}selected{% endif %}>Reciclajes</option>
+        <option value="canjes" {% if selected_type == 'canjes' %}selected{% endif %}>Canjes</option>
+        <option value="donaciones" {% if selected_type == 'donaciones' %}selected{% endif %}>Donaciones</option>
+      </select>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
+    {% if not has_data %}
+      <div class="no-data-message">
+        <p>No hay registros de {{ selected_type }} disponibles.</p>
+      </div>
+    {% else %}
+      <div class="table-container">
+        <table class="recycling-table">
+          <thead>
+            <tr>
+              {% if selected_type == 'reciclajes' %}
+                <th>Fecha</th>
+                <th>Material</th>
+                <th>Cantidad (kg)</th>
+                <th>Puntos Obtenidos</th>
+                <th>CO2 Reducido</th>
+                <th>Punto Reciclaje</th>
+                <th>Subtipo</th>
+              {% elif selected_type == 'canjes' %}
+                <th>Fecha</th>
+                <th>Recompensa</th>
+                <th>Puntos Descontados</th>
+                <th>Estado</th>
+              {% elif selected_type == 'donaciones' %}
+                <th>Fecha</th>
+                <th>Donación</th>
+                <th>Puntos Descontados</th>
+                <th>Estado</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in historial_data %}
+              <tr>
+                {% if selected_type == 'reciclajes' %}
+                  <td>{{ item.0 }}</td>
+                  <td>{{ item.1 }}</td>
+                  <td>{{ item.2 }}</td>
+                  <td>{{ item.3 }}</td>
+                  <td>{{ item.4 }}</td>
+                  <td>{{ item.5 }}</td>
+                  <td>{{ item.6 }}</td>
+                {% elif selected_type == 'canjes' %}
+                  <td>{{ item.0 }}</td>
+                  <td>{{ item.1 }}</td>
+                  <td>{{ item.2 }}</td>
+                  <td>{{ item.3 }}</td>
+                {% elif selected_type == 'donaciones' %}
+                  <td>{{ item.0 }}</td>
+                  <td>{{ item.1 }}</td>
+                  <td>{{ item.2 }}</td>
+                  <td>{{ item.3 }}</td>
+                {% endif %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% endif %}
+  </main>
+</body>
+</html>
