@@ -14,6 +14,9 @@ from django.contrib.auth.hashers import check_password
 from django.contrib import messages
 from django.http import HttpResponseRedirect
 from django.urls import reverse
+from django.http import JsonResponse
+import logging
+from datetime import timedelta
 
 # Formulario personalizado para login
 class LoginForm(forms.Form):
@@ -59,12 +62,189 @@ class LoginView(FormView):
         return response
 
 # Vista de inicio
+# def inicio(request):
+#     response = render(request, 'usuario_regular/inicio.html')
+#     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+#     response['Pragma'] = 'no-cache'
+#     response['Expires'] = '0'
+#     return response
+
+logger = logging.getLogger(__name__)
+
 def inicio(request):
-    response = render(request, 'usuario_regular/inicio.html')
+    top_recyclers = []
+    try:
+        with connection.cursor() as cursor:
+            # Obtener top 10 recicladores con totales y material más reciclado
+            cursor.execute(
+                """
+                SELECT 
+                    u.nombre,
+                    SUM(rr.puntos_obtenidos) AS total_puntos,
+                    (SELECT mr2.nombre 
+                     FROM Registro_Reciclaje rr2 
+                     JOIN Material_Reciclable mr2 ON rr2.id_material_reciclable = mr2.id_material_reciclable 
+                     WHERE rr2.id_usuario = u.id_usuario 
+                     GROUP BY rr2.id_material_reciclable 
+                     ORDER BY SUM(rr2.cantidad_kg) DESC 
+                     LIMIT 1) AS top_material,
+                    SUM(rr.cantidad_kg) AS total_kg
+                FROM Registro_Reciclaje rr
+                JOIN Usuario u ON rr.id_usuario = u.id_usuario
+                JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
+                WHERE rr.fecha_registro >= %s
+                GROUP BY u.id_usuario, u.nombre
+                ORDER BY total_puntos DESC
+                LIMIT 10
+                """,
+                [timezone.now() - timedelta(days=7)]
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                top_recyclers.append({
+                    'nombre': row[0],
+                    'total_puntos': row[1],
+                    'top_material': row[2] if row[2] else 'N/A',
+                    'total_kg': row[3]
+                })
+    except Exception as e:
+        logger.error(f"Error al obtener top recicladores: {str(e)}")
+
+    context = {'top_recyclers': top_recyclers}
+    response = render(request, 'usuario_regular/inicio.html', context)
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
+def reporte_ambiental(request):
+    environmental_data = []
+    today = timezone.now().date()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT tipo_basura,
+                       COALESCE(SUM(cantidad_reciclada_por_tipo), 0) AS total_reciclado,
+                       COALESCE(SUM(co2_reducido_por_tipo), 0) AS total_co2_reducido
+                FROM Impacto_Ambiental_Diario
+                WHERE DATE(fecha_dia) = %s
+                GROUP BY tipo_basura
+                """,
+                [today]
+            )
+            rows = cursor.fetchall()
+            cursor.execute("SELECT nombre FROM Material_Reciclable")
+            all_materials = {row[0] for row in cursor.fetchall()}
+            for row in rows:
+                if row[0] and row[0] != 'Electrónico':  # Excluir Electrónico
+                    environmental_data.append({
+                        'material': row[0],
+                        'cantidad_reciclada': float(row[1]),
+                        'co2_reducido': float(row[2])
+                    })
+            for material in all_materials:
+                if material != 'Electrónico' and not any(item['material'] == material for item in environmental_data):
+                    environmental_data.append({
+                        'material': material,
+                        'cantidad_reciclada': 0.0,
+                        'co2_reducido': 0.0
+                    })
+    except Exception as e:
+        logger.error(f"Error al obtener datos de impacto ambiental: {str(e)}")
+        cursor.execute("SELECT nombre FROM Material_Reciclable")
+        all_materials = {row[0] for row in cursor.fetchall()}
+        for material in all_materials:
+            if material != 'Electrónico':
+                environmental_data.append({
+                    'material': material,
+                    'cantidad_reciclada': 0.0,
+                    'co2_reducido': 0.0
+                })
+
+    # Ordenar por cantidad_reciclada de mayor a menor
+    environmental_data.sort(key=lambda x: x['cantidad_reciclada'], reverse=True)
+    total_kg = sum(item['cantidad_reciclada'] for item in environmental_data)
+    total_co2 = sum(item['co2_reducido'] for item in environmental_data)
+    best_material = max(environmental_data, key=lambda x: x['cantidad_reciclada'], default={'material': '-', 'cantidad_reciclada': 0})
+    daily_goal = 10.0
+    progress = min((total_kg / daily_goal) * 100, 100) if total_kg > 0 else 0
+
+    context = {
+        'environmental_data': environmental_data,
+        'total_kg': total_kg,
+        'total_co2': total_co2,
+        'best_material': best_material['material'],
+        'best_quantity': best_material['cantidad_reciclada'],
+        'progress': progress,
+        'current_date': timezone.now().strftime('%A, %d de %B de %Y')
+    }
+    return render(request, 'usuario_regular/reporte_ambiental.html', context)
+
+def reporte_ambiental_data(request):
+    chart_data = {}
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT fecha_dia, tipo_basura, cantidad_reciclada_por_tipo, co2_reducido_por_tipo
+                FROM Impacto_Ambiental_Diario
+                WHERE fecha_dia >= %s AND tipo_basura != 'Electrónico'
+                ORDER BY fecha_dia DESC
+                """,
+                [timezone.now() - timedelta(days=7)]
+            )
+            rows = cursor.fetchall()
+            for row in rows:
+                if row[1]:  # Verifica que tipo_basura no sea None
+                    fecha = row[0].strftime('%d/%m/%Y')
+                    material = row[1]
+                    cantidad = float(row[2]) if row[2] else 0.0
+                    if material not in chart_data:
+                        chart_data[material] = {'labels': [], 'data': []}
+                    chart_data[material]['labels'].append(fecha)
+                    chart_data[material]['data'].append(cantidad)
+    except Exception as e:
+        logger.error(f"Error al obtener datos para el gráfico: {str(e)}")
+
+    datasets = []
+    all_labels = set()
+    for material, data in chart_data.items():
+        all_labels.update(data['labels'])
+    all_labels = sorted(list(all_labels))
+
+    for material, data in chart_data.items():
+        datasets.append({
+            'label': material,
+            'data': [next((d for d, l in zip(chart_data[material]['data'], chart_data[material]['labels']) if l == label), 0.0) for label in all_labels],
+            'borderColor': ReporteAmbiental.getMaterialColor(material),
+            'backgroundColor': ReporteAmbiental.getMaterialColor(material) + '20',
+            'tension': 0.4,
+            'fill': False,
+            'pointBackgroundColor': ReporteAmbiental.getMaterialColor(material),
+            'pointBorderColor': '#fff',
+            'pointBorderWidth': 2,
+            'pointRadius': 5,
+            'pointHoverRadius': 7
+        })
+
+    return JsonResponse({
+        'labels': all_labels,
+        'datasets': datasets
+    }, safe=False)
+
+class ReporteAmbiental:
+    @staticmethod
+    def getMaterialColor(material):
+        colors = {
+            'Plástico': '#ff5722',
+            'Papel': '#795548',
+            'Metal': '#607d8b',
+            'Vidrio': '#2196f3',
+            'Orgánico': '#4caf50',
+            'Electrónico': '#9c27b0'
+        }
+        return colors.get(material, '#000000')
 
 # Vista de logout
 def logout_view(request):
@@ -127,7 +307,7 @@ def donacion(request):
     nombre_usuario = ""
     donaciones = []
     try:
-        user_id = request.session['user_id']
+        user_id = request.session.get('user_id')
         with connection.cursor() as cursor:
             cursor.execute("SELECT nombre FROM Usuario WHERE id_usuario = %s", [user_id])
             result = cursor.fetchone()
@@ -136,7 +316,7 @@ def donacion(request):
 
             cursor.execute(
                 """
-                SELECT id_donacion, nombre, entidad_donacion, monto_donacion
+                SELECT id_donacion, nombre, entidad_donacion, monto_donacion, ruta_imagen
                 FROM Donacion
                 """
             )
@@ -198,7 +378,7 @@ def catalogo(request):
 
             cursor.execute(
                 """
-                SELECT id_catalogo_recompensa, nombre, puntos_coste, stock
+                SELECT id_catalogo_recompensa, nombre, puntos_coste, stock, ruta_imagen
                 FROM Catalogo_Recompensa
                 WHERE disponible = TRUE AND stock > 0
                 """
@@ -430,7 +610,7 @@ def registro_reciclaje(request):
                 for punto in puntos_raw
             ]
 
-            # Obtener materiales disponibles para el punto seleccionado
+            # Obtener materiales disponibles para el punto seleccionado o todos si no hay selección
             if selected_punto:
                 cursor.execute(
                     """
@@ -489,8 +669,8 @@ def registro_reciclaje(request):
     except Exception as e:
         messages.error(request, f'Error al cargar datos: {str(e)}')
 
-    # Determinar qué template usar basado en la URL o preferencia (por ahora usa mapa.html)
-    template = 'usuario_regular/mapa.html'  # Cambia a 'usuario_regular/registro-reciclaje.html' si prefieres el otro
+    # Determinar qué template usar
+    template = 'usuario_regular/mapa.html'  # Usamos mapa.html como base
     response = render(request, template, {
         'materiales': materiales,
         'puntos': puntos,
@@ -500,3 +680,21 @@ def registro_reciclaje(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
+def get_materiales_punto(request, punto_id):
+    materiales = []
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT DISTINCT mr.id_material_reciclable, mr.nombre
+                FROM Material_Punto_Reciclaje mpr
+                JOIN Material_Reciclable mr ON mpr.id_material_reciclable = mr.id_material_reciclable
+                WHERE mpr.id_punto_reciclaje = %s
+                """,
+                [punto_id]
+            )
+            materiales = cursor.fetchall()
+    except Exception as e:
+        pass
+    return JsonResponse(materiales, safe=False)

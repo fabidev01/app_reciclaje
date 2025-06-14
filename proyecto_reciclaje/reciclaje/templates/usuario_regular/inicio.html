@@ -9,39 +9,59 @@
 </head>
 
 <body>
-  <header>
+  <header class="dashboard-header">
     <div class="container">
       <h1>Recicla y Gana</h1>
       <nav>
-        <a href="{% url 'inicio'%}" class="btn">Inicio</a>
-        <a href="{% url 'login'%}" class="btn">Iniciar Sesión</a>
-        <a href="{% url 'registro_usuario'%}" class="btn">Registro</a>
+        <a href="{% url 'inicio' %}" class="btn">Inicio</a>
+        <a href="{% url 'reporte_ambiental' %}" class="btn">Impacto Ambiental</a>
+        <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+        <a href="{% url 'registro_usuario' %}" class="btn">Registro</a>
       </nav>
     </div>
-    <img src="{% static 'img/salvar-el-mundo.png' %}" alt="" class="imagen" />
   </header>
-
-  <section class="hero">
+  
+  <section class="eco-hero">
+    <img src="{% static 'img/salvar-el-mundo.png' %}" alt="Salvar el mundo" class="eco-hero-image" />
     <div class="container">
-      <h2>Recicla, suma puntos y ayuda al planeta</h2>
-      <p>Transforma tus residuos en recompensas sostenibles.</p>
-      <a href="{%url 'dashboard'%}" class="btn">Comienza ahora</a>
+      <h2 class="eco-hero-title">Recicla, suma puntos y ayuda al planeta</h2>
+      <p class="eco-hero-subtitle">Transforma tus residuos en recompensas sostenibles.</p>
+      <a href="{% url 'dashboard' %}" class="eco-btn">Comienza ahora</a>
     </div>
   </section>
 
-  <section class="benefits">
+  <section class="eco-benefits">
     <div class="container">
-      <h3>¿Por qué usar nuestra plataforma?</h3>
-      <ul>
-        <li>♻️ Puntos por reciclar materiales</li>
-        <li>🌿 Catálogo de recompensas ecológicas</li>
-        <li>📊 Reportes de tu impacto ambiental</li>
+      <h3 class="eco-benefits-title">¿Por qué usar nuestra plataforma?</h3>
+      <ul class="eco-benefits-list">
+        <li class="eco-benefit-item">♻️ Puntos por reciclar materiales</li>
+        <li class="eco-benefit-item">🌿 Catálogo de recompensas ecológicas</li>
+        <li class="eco-benefit-item">📊 Reportes de tu impacto ambiental</li>
       </ul>
     </div>
   </section>
 
-  <footer>
-    <p>&copy; 2025 Plataforma de Reciclaje y Recompensas</p>
+  <section class="eco-top-recyclers">
+    <div class="container">
+      <h3 class="eco-top-recyclers-title">Top 10 Recicladores de la Semana</h3>
+      <div class="eco-recycler-ranking" style="max-height: 300px; overflow-y: auto;">
+        {% for recycler in top_recyclers %}
+          <div class="eco-recycler-item">
+            <span class="eco-recycler-rank">{{ forloop.counter }}.</span>
+            <span class="eco-recycler-name">{{ recycler.nombre }}</span>
+            <span class="eco-recycler-points">{{ recycler.total_puntos }} pts</span>
+            <span class="eco-recycler-top-material">{{ recycler.top_material }}</span>
+            <span class="eco-recycler-total-kg">{{ recycler.total_kg|floatformat:2 }} Kg</span>
+          </div>
+        {% empty %}
+          <p class="eco-no-recyclers">No hay datos de recicladores disponibles.</p>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <footer class="eco-footer">
+    <p>© 2025 Plataforma de Reciclaje y Recompensas</p>
   </footer>
 </body>
 </html>

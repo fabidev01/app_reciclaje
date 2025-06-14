@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registros de Reciclaje</title>
+  <title>Registros de Catálogo</title>
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
 <body class="dashboard-body">
@@ -16,6 +16,7 @@
       <a href="{% url 'admin_registros' %}">Ver Registros</a>
       <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
       <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
       <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
         <option value="#">Bitácoras ↓</option>
@@ -38,6 +39,7 @@
         <thead>
           <tr>
             <th>ID</th>
+            <th>Imagen</th>
             <th>Nombre</th>
             <th>Puntos Coste</th>
             <th>Disponible</th>
@@ -51,6 +53,7 @@
           {% for recompensa in recompensas %}
             <tr>
               <td>{{ recompensa.0 }}</td>
+              <td><img src="{% static recompensa.7 %}" alt="{{ recompensa.1 }}" class="admin-catalogo-img" /></td>
               <td>{{ recompensa.1 }}</td>
               <td>{{ recompensa.2 }}</td>
               <td>{{ recompensa.3|yesno:"Sí,No" }}</td>
@@ -58,17 +61,17 @@
               <td>{{ recompensa.5 }}</td>
               <td>{{ recompensa.6 }}</td>
               <td>
-                <button class="admin-catalogo-edit-btn" onclick="openEditModal('{{ recompensa.0 }}', '{{ recompensa.1|escapejs }}', '{{ recompensa.2 }}', {{ recompensa.3|yesno:"true,false" }}, '{{ recompensa.4 }}', '{{ recompensa.5 }}', '{{ recompensa.6|escapejs }}')">✏️</button>
-                <form method="post" action="{% url 'admin_catalogo' %}" style="display:inline;">
+                <button class="admin-catalogo-edit-btn" onclick="openEditModal('{{ recompensa.0 }}', '{{ recompensa.1|escapejs }}', '{{ recompensa.2 }}', {{ recompensa.3|yesno:"true,false" }}, '{{ recompensa.4 }}', '{{ recompensa.5 }}', '{{ recompensa.6|escapejs }}', '{{ recompensa.7|escapejs }}')">✏️</button>
+                <form method="post" action="{% url 'admin_catalogo' %}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar esta recompensa? Esto podría afectar canjes existentes.');">
                   {% csrf_token %}
                   <input type="hidden" name="id_recompensa" value="{{ recompensa.0 }}">
                   <input type="hidden" name="action" value="delete">
-                  <button type="submit" class="admin-catalogo-delete-btn" onclick="return confirm('¿Estás seguro de eliminar esta recompensa?')">🗑️</button>
+                  <button type="submit" class="admin-catalogo-delete-btn">🗑️</button>
                 </form>
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="8">Sin recompensas en el catálogo.</td></tr>
+            <tr><td colspan="9">Sin recompensas en el catálogo.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -86,32 +89,26 @@
           {% csrf_token %}
           <input type="hidden" name="id_recompensa" id="adminCatalogoEditId">
 
-          <!-- Campo para el nombre -->
           <label for="adminCatalogoEditNombre">Nombre:</label>
           <input type="text" name="nombre" id="adminCatalogoEditNombre" required />
 
-          <!-- Campo para el costo -->
           <label for="adminCatalogoEditPuntosCoste">Puntos Coste:</label>
           <input type="number" name="puntos_coste" id="adminCatalogoEditPuntosCoste" min="0" required />
 
-          <!-- Campo para disponible -->
           <label for="adminCatalogoEditDisponible">Disponible:</label>
           <input type="checkbox" name="disponible" id="adminCatalogoEditDisponible" />
 
-          <!-- Campo para el stock -->
           <label for="adminCatalogoEditStock">Stock:</label>
           <input type="number" name="stock" id="adminCatalogoEditStock" min="0" required />
 
-          <!-- Campo para el descuento -->
           <label for="adminCatalogoEditDescuento">Descuento:</label>
           <input type="number" name="descuento" id="adminCatalogoEditDescuento" step="0.1" min="0" required />
 
-          <!-- Campo para la categoría -->
           <label for="adminCatalogoEditCategoria">Categoría:</label>
           <select name="categoria" id="adminCatalogoEditCategoria" required>
             <option value="Descuento">Descuento</option>
             <option value="Producto">Producto</option>
-            <option value="Donación">Donación</option>
+            <option value="Entrada">Entrada</option>
           </select>
 
           <button type="submit" class="admin-catalogo-save-btn">Guardar Cambios</button>
@@ -128,32 +125,26 @@
           {% csrf_token %}
           <input type="hidden" name="action" value="add">
 
-          <!-- Campo para el nombre -->
           <label for="adminCatalogoAddNombre">Nombre:</label>
           <input type="text" name="nombre" id="adminCatalogoAddNombre" required />
 
-          <!-- Campo para el costo -->
           <label for="adminCatalogoAddPuntosCoste">Puntos Coste:</label>
           <input type="number" name="puntos_coste" id="adminCatalogoAddPuntosCoste" min="0" required />
 
-          <!-- Campo para disponible -->
           <label for="adminCatalogoAddDisponible">Disponible:</label>
           <input type="checkbox" name="disponible" id="adminCatalogoAddDisponible" checked />
 
-          <!-- Campo para el stock -->
           <label for="adminCatalogoAddStock">Stock:</label>
           <input type="number" name="stock" id="adminCatalogoAddStock" min="0" required />
 
-          <!-- Campo para el descuento -->
           <label for="adminCatalogoAddDescuento">Descuento:</label>
           <input type="number" name="descuento" id="adminCatalogoAddDescuento" step="0.1" min="0" required />
 
-          <!-- Campo para la categoría -->
           <label for="adminCatalogoAddCategoria">Categoría:</label>
           <select name="categoria" id="adminCatalogoAddCategoria" required>
             <option value="Descuento">Descuento</option>
             <option value="Producto">Producto</option>
-            <option value="Donación">Donación</option>
+            <option value="Entrada">Entrada</option>
           </select>
 
           <button type="submit" class="admin-catalogo-save-btn">Añadir Recompensa</button>
@@ -162,7 +153,7 @@
     </div>
 
   <script>
-    function openEditModal(id, nombre, puntos_coste, disponible, stock, descuento, categoria) {
+    function openEditModal(id, nombre, puntos_coste, disponible, stock, descuento, categoria, imagen) {
       document.getElementById('adminCatalogoEditId').value = id;
       document.getElementById('adminCatalogoEditNombre').value = nombre || '';
       document.getElementById('adminCatalogoEditPuntosCoste').value = puntos_coste || 0;
@@ -170,6 +161,7 @@
       document.getElementById('adminCatalogoEditStock').value = stock || 0;
       document.getElementById('adminCatalogoEditDescuento').value = descuento || 0;
       document.getElementById('adminCatalogoEditCategoria').value = categoria || '';
+      // No incluimos la imagen en el formulario de edición por ahora (puedes añadir un campo si lo deseas)
 
       const modal = document.getElementById('adminCatalogoEditModal');
       modal.classList.add('active');

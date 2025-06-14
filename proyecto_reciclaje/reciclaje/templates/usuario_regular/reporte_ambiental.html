@@ -1,0 +1,112 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Reporte Ambiental - Plataforma de Reciclaje</title>
+  <link rel="stylesheet" href="{% static 'css/registro_ambiental.css' %}" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="report-body">
+  <header class="dashboard-header">
+    <div class="container">
+      <h1>Recicla y Gana</h1>
+      <nav>
+        <a href="{% url 'inicio' %}" class="btn">Inicio</a>
+        <a href="{% url 'reporte_ambiental' %}" class="btn">Impacto Ambiental</a>
+        <a href="{% url 'login' %}" class="btn">Iniciar Sesión</a>
+        <a href="{% url 'registro_usuario' %}" class="btn">Registro</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="report-main">
+    <div class="container">
+      <div class="report-header">
+        <h2>📊 Impacto Ambiental Diario</h2>
+        <p class="report-date">Último reporte: <span id="currentDate">{{ current_date }}</span></p>
+      </div>
+
+      <div class="report-content">
+        <div class="chart-container">
+          <h3>Tendencia de Reciclaje por Material</h3>
+          <canvas id="recyclingChart"></canvas>
+        </div>
+
+        <div class="data-table-container">
+          <h3>Resumen por Material</h3>
+          <div class="table-wrapper">
+            <table id="environmentalTable" class="environmental-table">
+              <thead>
+                <tr>
+                  <th>Material</th>
+                  <th>Total Reciclado (Kg)</th>
+                  <th>CO₂ Reducido (Kg)</th>
+                  <th>Tendencia</th>
+                </tr>
+              </thead>
+              <tbody id="environmentalTableBody">
+                {% for item in environmental_data %}
+                  <tr class="fade-in-up">
+                    <td class="material-cell {% if item.material|lower|slugify == 'plastico' %}material-plastico{% elif item.material|lower|slugify == 'papel' %}material-papel{% elif item.material|lower|slugify == 'metal' %}material-metal{% elif item.material|lower|slugify == 'vidrio' %}material-vidrio{% elif item.material|lower|slugify == 'carton' %}material-cartón{% elif item.material|lower|slugify == 'organico' %}material-orgánico{% elif item.material|lower|slugify == 'electronico' %}material-electrónico{% endif %}">{{ item.material }}</td>
+                    <td><strong>{{ item.cantidad_reciclada|floatformat:2 }}</strong></td>
+                    <td><strong>{{ item.co2_reducido|floatformat:2 }}</strong></td>
+                    <td class="trend-up">↑</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+              <tfoot>
+                <tr class="totals-row">
+                  <td><strong>TOTAL</strong></td>
+                  <td><strong id="totalKgTable">{{ total_kg|floatformat:2 }}</strong></td>
+                  <td><strong id="totalCO2Table">{{ total_co2|floatformat:2 }}</strong></td>
+                  <td>-</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="report-summary">
+        <div class="summary-card">
+          <h4>🌍 Impacto Total</h4>
+          <p><strong id="totalRecycled">{{ total_kg|floatformat:2 }} Kg</strong> reciclados</p>
+          <p><strong id="totalCO2">{{ total_co2|floatformat:2 }} Kg</strong> CO₂ reducido</p>
+        </div>
+        
+        <div class="summary-card">
+          <h4>📈 Mejor Material</h4>
+          <p id="bestMaterial">{{ best_material }}</p>
+          <p id="bestTrend">{{ best_quantity|floatformat:2 }} Kg (↑)</p>
+        </div>
+        
+        <div class="report-progress-card">
+          <h4>🎯 Meta Diaria</h4>
+          <p><span id="dailyProgress">{{ progress|default:0|floatformat:2 }}%</span> completada</p>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" data-progress="{% if progress is not None %}{{ progress }}{% else %}0{% endif %}"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <p>© 2025 Plataforma de Reciclaje y Recompensas - Reporte Ambiental</p>
+  </footer>
+
+  <script src="{% static 'js/reporte_ambiental.js' %}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const progressFill = document.getElementById('progressFill');
+      const progress = parseFloat(progressFill.getAttribute('data-progress')) || 0;
+      progressFill.style.width = `${progress}%`;
+      progressFill.style.transition = 'width 1s ease';
+    });
+  </script>
+</body>
+</html>

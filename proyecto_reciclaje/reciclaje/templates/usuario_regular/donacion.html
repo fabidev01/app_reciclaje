@@ -46,7 +46,7 @@
                 {% for donacion in donaciones %}
                     <tr>
                         <td>
-                            <img class="imagen-tabla" src="{% static 'img/donacion_'|add:donacion.0|add:'.jpeg' %}" alt="{{ donacion.1 }}" />
+                            <img class="imagen-tabla" src="{% static donacion.4 %}" alt="{{ donacion.1 }}" />
                         </td>
                         <td>{{ donacion.2 }}</td> 
                         <td>{{ donacion.1 }}</td>

@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
 <body class="dashboard-body">
- <header class="dashboard-header">
+  <header class="dashboard-header">
     <h1>Bienvenido, Admin</h1>
     <nav>
       <a href="{% url 'admin_panel' %}">Inicio</a>
@@ -16,6 +16,7 @@
       <a href="{% url 'admin_registros' %}">Ver Registros</a>
       <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
       <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
       <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
         <option value="#">Bitácoras ↓</option>
@@ -38,13 +39,14 @@
       <thead>
         <tr>
           <th>ID</th>
-          <th>Id_usuario</th>
-          <th>Id_punto_reciclaje</th>
-          <th>Cantidad</th>
+          <th>Nombre de Usuario</th>
+          <th>Correo</th>
+          <th>Nombre de Punto</th>
+          <th>Cantidad (kg)</th>
           <th>Puntos</th>
           <th>CO2 Reducido</th>
           <th>Fecha Registro</th>
-          <th>Nombre Subtipo</th>
+          <th>Nombre de Material</th>
         </tr>
       </thead>
       <tbody>
@@ -58,10 +60,11 @@
             <td>{{ registro.5 }}</td>
             <td>{{ registro.6 }}</td>
             <td>{{ registro.7 }}</td>
+            <td>{{ registro.8 }}</td>
           </tr>
         {% empty %}
           <tr>
-            <td colspan="8">No hay registros de reciclaje.</td>
+            <td colspan="9">No hay registros de reciclaje.</td>
           </tr>
         {% endfor %}
       </tbody>

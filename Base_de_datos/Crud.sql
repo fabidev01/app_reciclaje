@@ -291,11 +291,12 @@ CREATE PROCEDURE insertar_catalogo_recompensa(
     IN p_disponible BOOLEAN,
     IN p_stock INT,
     IN p_descuento FLOAT,
-    IN p_categoria VARCHAR(35)
+    IN p_categoria VARCHAR(35),
+	IN p_ruta_imagen VARCHAR(255)
 )
 BEGIN
-    INSERT INTO Catalogo_Recompensa (nombre, puntos_coste, disponible, stock, descuento, categoria)
-    VALUES (p_nombre, p_puntos_coste, p_disponible, p_stock, p_descuento, p_categoria);
+    INSERT INTO Catalogo_Recompensa (nombre, puntos_coste, disponible, stock, descuento, categoria, ruta_imagen)
+    VALUES (p_nombre, p_puntos_coste, p_disponible, p_stock, p_descuento, p_categoria, p_ruta_imagen);
 END //
 
 CREATE PROCEDURE actualizar_catalogo_recompensa(
@@ -305,7 +306,8 @@ CREATE PROCEDURE actualizar_catalogo_recompensa(
     IN p_disponible BOOLEAN,
     IN p_stock INT,
     IN p_descuento FLOAT,
-    IN p_categoria VARCHAR(35)
+    IN p_categoria VARCHAR(35),
+	IN p_ruta_imagen VARCHAR(255)
 )
 BEGIN
     UPDATE Catalogo_Recompensa
@@ -314,7 +316,8 @@ BEGIN
         disponible = p_disponible,
         stock = p_stock,
         descuento = p_descuento,
-        categoria = p_categoria
+        categoria = p_categoria,
+        ruta_imagen = p_ruta_imagen
     WHERE id_catalogo_recompensa = p_id_catalogo_recompensa;
 END //
 
@@ -330,24 +333,27 @@ END //
 CREATE PROCEDURE insertar_donacion(
     IN p_nombre VARCHAR(35),
     IN p_entidad_donacion VARCHAR(35),
-    IN p_monto_donacion FLOAT
+    IN p_monto_donacion FLOAT,
+    IN p_ruta_imagen VARCHAR(255)
 )
 BEGIN
-    INSERT INTO Donacion (nombre, entidad_donacion, monto_donacion)
-    VALUES (p_nombre, p_entidad_donacion, p_monto_donacion);
+    INSERT INTO Donacion (nombre, entidad_donacion, monto_donacion, ruta_imagen)
+    VALUES (p_nombre, p_entidad_donacion, p_monto_donacion, p_ruta_imagen);
 END //
 
 CREATE PROCEDURE actualizar_donacion(
     IN p_id_donacion INT,
     IN p_nombre VARCHAR(35),
     IN p_entidad_donacion VARCHAR(35),
-    IN p_monto_donacion FLOAT
+    IN p_monto_donacion FLOAT,
+    IN p_ruta_imagen VARCHAR(255)
 )
 BEGIN
     UPDATE Donacion
     SET nombre = p_nombre,
         entidad_donacion = p_entidad_donacion,
-        monto_donacion = p_monto_donacion
+        monto_donacion = p_monto_donacion,
+        ruta_imagen = p_ruta_imagen
     WHERE id_donacion = p_id_donacion;
 END //
 CREATE PROCEDURE eliminar_donacion(

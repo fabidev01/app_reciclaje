@@ -1,0 +1,254 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Puntos de Reciclaje</title>
+  <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+</head>
+<body class="dashboard-body">
+  <header class="dashboard-header">
+    <h1>Bienvenido, Admin</h1>
+    <nav class="dashboard-navigation-menu">
+      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
+      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
+        <option value="#">Bitácoras ↓</option>
+        <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
+        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
+        <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
+      </select>
+      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
+    </nav>
+  </header>
+
+  <main class="admin-puntos-reciclaje-main-content">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="admin-puntos-reciclaje-message-container admin-puntos-reciclaje-message-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <h2 class="admin-puntos-reciclaje-heading-title">Puntos de Reciclaje</h2>
+    <div class="admin-puntos-reciclaje-table-container">
+      <table class="admin-puntos-reciclaje-data-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Capacidad Máxima</th>
+            <th>Hora Apertura</th>
+            <th>Hora Cierre</th>
+            <th>Latitud</th>
+            <th>Longitud</th>
+            <th>Estado</th>
+            <th>Materiales Permitidos</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for punto in puntos_reciclaje %}
+            <tr>
+              <td>{{ punto.0 }}</td>
+              <td>{{ punto.1 }}</td>
+              <td>{{ punto.2 }}</td>
+              <td>{{ punto.3 }}</td>
+              <td>{{ punto.4 }}</td>
+              <td>{{ punto.5 }}</td>
+              <td>{{ punto.6 }}</td>
+              <td>{{ punto.7 }}</td>
+              <td>{{ punto.9|default:"Ninguno" }}</td>
+              <td>
+                <button class="admin-puntos-reciclaje-edit-button" onclick="openEditModal('{{ punto.0 }}', '{{ punto.1|escapejs }}', {{ punto.2 }}, '{{ punto.3|escapejs }}', '{{ punto.4|escapejs }}', {{ punto.5 }}, {{ punto.6 }}, '{{ punto.7|escapejs }}', '{{ punto.8|default:"" }}')">✏️</button>
+                <button class="admin-puntos-reciclaje-delete-button" onclick="confirmDelete('{{ punto.0 }}')">🗑️</button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="10">No hay puntos de reciclaje registrados.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-puntos-reciclaje-action-container">
+      <button class="admin-puntos-reciclaje-add-button-green" onclick="openAddModal()">Añadir Nuevo Punto</button>
+    </div>
+
+    <!-- Modal para añadir punto -->
+    <div id="adminPuntosAddModal" class="admin-puntos-reciclaje-modal-overlay">
+      <div class="admin-puntos-reciclaje-modal-content-box">
+        <span class="admin-puntos-reciclaje-modal-close-button" onclick="closeAddModal()">×</span>
+        <h2 class="admin-puntos-reciclaje-modal-title">Añadir Nuevo Punto de Reciclaje</h2>
+        <form id="adminPuntosAddForm" method="post" action="{% url 'admin_puntos' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add">
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddNombre" class="admin-puntos-reciclaje-modal-label">Nombre</label>
+            <input type="text" name="nombre" id="adminPuntosAddNombre" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddCapacidad" class="admin-puntos-reciclaje-modal-label">Capacidad Máxima</label>
+            <input type="number" name="capacidad_maxima" id="adminPuntosAddCapacidad" class="admin-puntos-reciclaje-modal-input" min="0" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddHoraApertura" class="admin-puntos-reciclaje-modal-label">Hora Apertura</label>
+            <input type="time" name="hora_apertura" id="adminPuntosAddHoraApertura" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddHoraCierre" class="admin-puntos-reciclaje-modal-label">Hora Cierre</label>
+            <input type="time" name="hora_cierre" id="adminPuntosAddHoraCierre" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddLatitud" class="admin-puntos-reciclaje-modal-label">Latitud</label>
+            <input type="number" step="0.0001" name="latitud" id="adminPuntosAddLatitud" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddLongitud" class="admin-puntos-reciclaje-modal-label">Longitud</label>
+            <input type="number" step="0.0001" name="longitud" id="adminPuntosAddLongitud" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosAddEstado" class="admin-puntos-reciclaje-modal-label">Estado</label>
+            <select name="estado_punto" id="adminPuntosAddEstado" class="admin-puntos-reciclaje-modal-input" required>
+              <option value="Disponible">Disponible</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Cerrado">Cerrado</option>
+            </select>
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label class="admin-puntos-reciclaje-modal-label">Materiales Permitidos</label>
+            <div class="admin-puntos-reciclaje-modal-material-list">
+              {% for material in materiales %}
+                <div class="admin-puntos-reciclaje-modal-material-item">
+                  <label class="admin-puntos-reciclaje-modal-checkbox-label">
+                    <input type="checkbox" name="materiales" value="{{ material.0 }}" data-index="{{ forloop.counter0 }}"> {{ material.1 }}
+                  </label>
+                  <input type="text" name="condiciones" class="admin-puntos-reciclaje-modal-condition-input" placeholder="Condiciones específicas" data-index="{{ forloop.counter0 }}">
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="submit" class="admin-puntos-reciclaje-modal-save-button">Guardar Punto</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para editar punto -->
+    <div id="adminPuntosEditModal" class="admin-puntos-reciclaje-modal-overlay">
+      <div class="admin-puntos-reciclaje-modal-content-box">
+        <span class="admin-puntos-reciclaje-modal-close-button" onclick="closeEditModal()">×</span>
+        <h2 class="admin-puntos-reciclaje-modal-title">Editar Punto de Reciclaje</h2>
+        <form id="adminPuntosEditForm" method="post" action="{% url 'admin_puntos' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="edit">
+          <input type="hidden" name="id_punto_reciclaje" id="adminPuntosEditId">
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditNombre" class="admin-puntos-reciclaje-modal-label">Nombre</label>
+            <input type="text" name="nombre" id="adminPuntosEditNombre" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditCapacidad" class="admin-puntos-reciclaje-modal-label">Capacidad Máxima</label>
+            <input type="number" name="capacidad_maxima" id="adminPuntosEditCapacidad" class="admin-puntos-reciclaje-modal-input" min="0" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditHoraApertura" class="admin-puntos-reciclaje-modal-label">Hora Apertura</label>
+            <input type="time" name="hora_apertura" id="adminPuntosEditHoraApertura" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditHoraCierre" class="admin-puntos-reciclaje-modal-label">Hora Cierre</label>
+            <input type="time" name="hora_cierre" id="adminPuntosEditHoraCierre" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditLatitud" class="admin-puntos-reciclaje-modal-label">Latitud</label>
+            <input type="number" step="0.0001" name="latitud" id="adminPuntosEditLatitud" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditLongitud" class="admin-puntos-reciclaje-modal-label">Longitud</label>
+            <input type="number" step="0.0001" name="longitud" id="adminPuntosEditLongitud" class="admin-puntos-reciclaje-modal-input" required />
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label for="adminPuntosEditEstado" class="admin-puntos-reciclaje-modal-label">Estado</label>
+            <select name="estado_punto" id="adminPuntosEditEstado" class="admin-puntos-reciclaje-modal-input" required>
+              <option value="Disponible">Disponible</option>
+              <option value="Mantenimiento">Mantenimiento</option>
+              <option value="Cerrado">Cerrado</option>
+            </select>
+          </div>
+          <div class="admin-puntos-reciclaje-modal-field">
+            <label class="admin-puntos-reciclaje-modal-label">Materiales Permitidos</label>
+            <div class="admin-puntos-reciclaje-modal-material-list">
+              {% for material in materiales %}
+                <div class="admin-puntos-reciclaje-modal-material-item">
+                  <label class="admin-puntos-reciclaje-modal-checkbox-label">
+                    <input type="checkbox" name="materiales" value="{{ material.0 }}" data-index="{{ forloop.counter0 }}"> {{ material.1 }}
+                  </label>
+                  <input type="text" name="condiciones" class="admin-puntos-reciclaje-modal-condition-input" placeholder="Condiciones específicas" data-index="{{ forloop.counter0 }}">
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          <button type="submit" class="admin-puntos-reciclaje-modal-save-button">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+
+  <script>
+    function redirigirBitacora(url) {
+      if (url) window.location.href = url;
+    }
+
+    function openAddModal() {
+      document.getElementById('adminPuntosAddNombre').value = '';
+      document.getElementById('adminPuntosAddCapacidad').value = '0';
+      document.getElementById('adminPuntosAddHoraApertura').value = '08:00';
+      document.getElementById('adminPuntosAddHoraCierre').value = '18:00';
+      document.getElementById('adminPuntosAddLatitud').value = '-17.3833';
+      document.getElementById('adminPuntosAddLongitud').value = '-66.1568';
+      document.getElementById('adminPuntosAddEstado').value = 'Disponible';
+      document.querySelectorAll('#adminPuntosAddModal input[name="materiales"]').forEach(checkbox => checkbox.checked = false);
+      document.querySelectorAll('#adminPuntosAddModal input[name="condiciones"]').forEach(input => input.value = '');
+      document.getElementById('adminPuntosAddModal').classList.add('active');
+    }
+
+    function closeAddModal() {
+      document.getElementById('adminPuntosAddModal').classList.remove('active');
+    }
+
+    function openEditModal(id, nombre, capacidad, hora_apertura, hora_cierre, latitud, longitud, estado, material_conditions) {
+      document.getElementById('adminPuntosEditId').value = id;
+      document.getElementById('adminPuntosEditNombre').value = nombre;
+      document.getElementById('adminPuntosEditCapacidad').value = capacidad;
+      document.getElementById('adminPuntosEditHoraApertura').value = hora_apertura;
+      document.getElementById('adminPuntosEditHoraCierre').value = hora_cierre;
+      document.getElementById('adminPuntosEditLatitud').value = latitud;
+      document.getElementById('adminPuntosEditLongitud').value = longitud;
+      document.getElementById('adminPuntosEditEstado').value = estado;
+      const materialConditionsMap = material_conditions ? material_conditions.split(',').reduce((map, item) => {
+        const [matId, cond] = item.split(':');
+        map[matId] = cond;
+        return map;
+      }, {}) : {};
+      const checkboxes = document.querySelectorAll('#adminPuntosEditModal input[name="materiales"]');
+      const conditionInputs = document.querySelectorAll('#adminPuntosEditModal input[name="condiciones"]');
+      checkboxes.forEach((checkbox, index) => {
+        checkbox.checked = materialConditionsMap[checkbox.value] !== undefined;
+        conditionInputs[index].value = materialConditionsMap[checkbox.value] || '';
+      });
+      document.getElementById('adminPuntosEditModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+      document.getElementById('adminPuntosEditModal').classList.remove('active');
+    }
+
+    function confirmDelete(id) {
+      if (confirm('¿Estás seguro de eliminar este punto de reciclaje?')) {
+        window.location.href = "{% url 'admin_puntos' %}?action=delete&id=" + id;
+      }
+    }
+  </script>
+</body>
+</html>

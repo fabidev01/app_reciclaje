@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Registros de Reciclaje</title>
+  <title>Gestión de Donaciones</title>
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
 <body class="dashboard-body">
@@ -16,6 +16,7 @@
       <a href="{% url 'admin_registros' %}">Ver Registros</a>
       <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
       <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
       <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
         <option value="#">Bitácoras ↓</option>
@@ -39,12 +40,10 @@
         <thead>
           <tr>
             <th>ID</th>
+            <th>Imagen</th>
             <th>Nombre</th>
-            <th>Puntos Coste</th>
-            <th>Disponible</th>
-            <th>Stock</th>
-            <th>Descuento</th>
-            <th>Categoría</th>
+            <th>Entidad</th>
+            <th>Monto (Puntos)</th>
             <th>Acción</th>
           </tr>
         </thead>
@@ -52,24 +51,22 @@
           {% for donacion in donaciones %}
             <tr>
               <td>{{ donacion.0 }}</td>
+              <td><img src="{% static donacion.4 %}" alt="{{ donacion.1 }}" class="admin-catalogo-img" /></td>
               <td>{{ donacion.1 }}</td>
               <td>{{ donacion.2 }}</td>
-              <td>{{ donacion.3|yesno:"Sí,No" }}</td>
-              <td>{{ donacion.4 }}</td>
-              <td>{{ donacion.5 }}</td>
-              <td>{{ donacion.6 }}</td>
+              <td>{{ donacion.3 }}</td>
               <td>
-                <button class="admin-donacion-edit-btn" onclick="openEditModal('{{ donacion.0 }}', '{{ donacion.1|escapejs }}', '{{ donacion.2 }}', {{ donacion.3|yesno:"true,false" }}, '{{ donacion.4 }}', '{{ donacion.5 }}', '{{ donacion.6|escapejs }}')">✏️</button>
-                <form method="post" action="{% url 'admin_donacion' %}" style="display:inline;">
+                <button class="admin-donacion-edit-btn" onclick="openEditModal('{{ donacion.0 }}', '{{ donacion.1|escapejs }}', '{{ donacion.2|escapejs }}', '{{ donacion.3 }}', '{{ donacion.4|escapejs }}')">✏️</button>
+                <form method="post" action="{% url 'admin_donacion' %}" style="display:inline;" onsubmit="return confirm('¿Estás seguro de eliminar esta donación? Esto podría afectar canjes existentes.');">
                   {% csrf_token %}
                   <input type="hidden" name="id_donacion" value="{{ donacion.0 }}">
                   <input type="hidden" name="action" value="delete">
-                  <button type="submit" class="admin-donacion-delete-btn" onclick="return confirm('¿Estás seguro de eliminar esta donación?')">🗑️</button>
+                  <button type="submit" class="admin-donacion-delete-btn">🗑️</button>
                 </form>
               </td>
             </tr>
           {% empty %}
-            <tr><td colspan="8">Sin donaciones registradas.</td></tr>
+            <tr><td colspan="6">Sin donaciones registradas.</td></tr>
           {% endfor %}
         </tbody>
       </table>
@@ -87,33 +84,14 @@
           {% csrf_token %}
           <input type="hidden" name="id_donacion" id="adminDonacionEditId">
 
-          <!-- Campo para el nombre -->
           <label for="adminDonacionEditNombre">Nombre:</label>
           <input type="text" name="nombre" id="adminDonacionEditNombre" required />
 
-          <!-- Campo para el costo -->
-          <label for="adminDonacionEditPuntosCoste">Puntos Coste:</label>
-          <input type="number" name="puntos_coste" id="adminDonacionEditPuntosCoste" min="0" required />
+          <label for="adminDonacionEditEntidad">Entidad:</label>
+          <input type="text" name="entidad_donacion" id="adminDonacionEditEntidad" required />
 
-          <!-- Campo para disponible -->
-          <label for="adminDonacionEditDisponible">Disponible:</label>
-          <input type="checkbox" name="disponible" id="adminDonacionEditDisponible" />
-
-          <!-- Campo para el stock -->
-          <label for="adminDonacionEditStock">Stock:</label>
-          <input type="number" name="stock" id="adminDonacionEditStock" min="0" required />
-
-          <!-- Campo para el descuento -->
-          <label for="adminDonacionEditDescuento">Descuento:</label>
-          <input type="number" name="descuento" id="adminDonacionEditDescuento" step="0.1" min="0" required />
-
-          <!-- Campo para la categoría -->
-          <label for="adminDonacionEditCategoria">Categoría:</label>
-          <select name="categoria" id="adminDonacionEditCategoria" required>
-            <option value="Descuento">Descuento</option>
-            <option value="Producto">Producto</option>
-            <option value="Donación">Donación</option>
-          </select>
+          <label for="adminDonacionEditMonto">Monto (Puntos):</label>
+          <input type="number" name="monto_donacion" id="adminDonacionEditMonto" min="0" required />
 
           <button type="submit" class="admin-donacion-save-btn">Guardar Cambios</button>
         </form>
@@ -129,33 +107,14 @@
           {% csrf_token %}
           <input type="hidden" name="action" value="add">
 
-          <!-- Campo para el nombre -->
           <label for="adminDonacionAddNombre">Nombre:</label>
           <input type="text" name="nombre" id="adminDonacionAddNombre" required />
 
-          <!-- Campo para el costo -->
-          <label for="adminDonacionAddPuntosCoste">Puntos Coste:</label>
-          <input type="number" name="puntos_coste" id="adminDonacionAddPuntosCoste" min="0" required />
+          <label for="adminDonacionAddEntidad">Entidad:</label>
+          <input type="text" name="entidad_donacion" id="adminDonacionAddEntidad" required />
 
-          <!-- Campo para disponible -->
-          <label for="adminDonacionAddDisponible">Disponible:</label>
-          <input type="checkbox" name="disponible" id="adminDonacionAddDisponible" checked />
-
-          <!-- Campo para el stock -->
-          <label for="adminDonacionAddStock">Stock:</label>
-          <input type="number" name="stock" id="adminDonacionAddStock" min="0" required />
-
-          <!-- Campo para el descuento -->
-          <label for="adminDonacionAddDescuento">Descuento:</label>
-          <input type="number" name="descuento" id="adminDonacionAddDescuento" step="0.1" min="0" required />
-
-          <!-- Campo para la categoría -->
-          <label for="adminDonacionAddCategoria">Categoría:</label>
-          <select name="categoria" id="adminDonacionAddCategoria" required>
-            <option value="Descuento">Descuento</option>
-            <option value="Producto">Producto</option>
-            <option value="Donación">Donación</option>
-          </select>
+          <label for="adminDonacionAddMonto">Monto (Puntos):</label>
+          <input type="number" name="monto_donacion" id="adminDonacionAddMonto" min="0" required />
 
           <button type="submit" class="admin-donacion-save-btn">Añadir Donación</button>
         </form>
@@ -163,14 +122,11 @@
     </div>
 
   <script>
-    function openEditModal(id, nombre, puntos_coste, disponible, stock, descuento, categoria) {
+    function openEditModal(id, nombre, entidad, monto, imagen) {
       document.getElementById('adminDonacionEditId').value = id;
       document.getElementById('adminDonacionEditNombre').value = nombre || '';
-      document.getElementById('adminDonacionEditPuntosCoste').value = puntos_coste || 0;
-      document.getElementById('adminDonacionEditDisponible').checked = disponible === 'true';
-      document.getElementById('adminDonacionEditStock').value = stock || 0;
-      document.getElementById('adminDonacionEditDescuento').value = descuento || 0;
-      document.getElementById('adminDonacionEditCategoria').value = categoria || '';
+      document.getElementById('adminDonacionEditEntidad').value = entidad || '';
+      document.getElementById('adminDonacionEditMonto').value = monto || 0;
 
       const modal = document.getElementById('adminDonacionEditModal');
       modal.classList.add('active');
@@ -183,11 +139,8 @@
 
     function openAddModal() {
       document.getElementById('adminDonacionAddNombre').value = '';
-      document.getElementById('adminDonacionAddPuntosCoste').value = 0;
-      document.getElementById('adminDonacionAddDisponible').checked = true;
-      document.getElementById('adminDonacionAddStock').value = 0;
-      document.getElementById('adminDonacionAddDescuento').value = 0;
-      document.getElementById('adminDonacionAddCategoria').value = 'Donación';
+      document.getElementById('adminDonacionAddEntidad').value = '';
+      document.getElementById('adminDonacionAddMonto').value = 0;
 
       const modal = document.getElementById('adminDonacionAddModal');
       modal.classList.add('active');

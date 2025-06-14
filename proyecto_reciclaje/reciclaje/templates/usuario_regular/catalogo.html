@@ -47,7 +47,7 @@
                 {% for item in catalogo %}
                     <tr>
                         <td>
-                            <img class="imagen-tabla" src="{% static 'img/recompensa_'|add:item.0|add:'.jpeg' %}" alt="{{ item.1 }}" />
+                            <img class="imagen-tabla" src="{% static item.4 %}" alt="{{ item.1 }}" />
                         </td>
                         <td>{{ item.1 }}</td> <!-- Nombre -->
                         <td>{{ item.2 }}</td> <!-- Puntos Coste -->

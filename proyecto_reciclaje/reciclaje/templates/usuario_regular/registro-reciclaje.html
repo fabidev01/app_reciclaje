@@ -5,41 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registrar Reciclaje</title>
-  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}" />
-  <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      const puntoSelect = document.getElementById('punto');
-      const tipoSelect = document.getElementById('tipo');
-      let materiales = JSON.parse('{{ materiales|escapejs }}' || '[]');
-
-      function updateMateriales() {
-        const selectedPunto = puntoSelect.value;
-        tipoSelect.innerHTML = '<option value="">Seleccione</option>';
-        if (selectedPunto) {
-          fetch(`/get_materiales/?punto_id=${selectedPunto}`)
-            .then(response => response.json())
-            .then(data => {
-              data.forEach(material => {
-                let option = document.createElement('option');
-                option.value = material.id;
-                option.text = material.nombre;
-                tipoSelect.appendChild(option);
-              });
-            });
-        } else {
-          materiales.forEach(material => {
-            let option = document.createElement('option');
-            option.value = material[0];
-            option.text = material[1];
-            tipoSelect.appendChild(option);
-          });
-        }
-      }
-
-      puntoSelect.addEventListener('change', updateMateriales);
-      updateMateriales(); // Cargar materiales iniciales
-    });
-  </script>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
 </head>
 
 <body class="form-body">
@@ -77,7 +43,7 @@
         <select id="punto" name="punto" required>
           <option value="">Seleccione</option>
           {% for punto in puntos %}
-            <option value="{{ punto.id_punto_reciclaje }}">{{ punto.nombre }} - {{ punto.latitud }}, {{ punto.longitud }}</option>
+            <option value="{{ punto.0 }}">{{ punto.1 }} - {{ punto.2 }}</option>
           {% endfor %}
         </select>
       </div>

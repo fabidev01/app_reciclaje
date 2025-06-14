@@ -89,7 +89,8 @@ CREATE TABLE Catalogo_Recompensa (
     disponible BOOLEAN NOT NULL,
     stock INT NOT NULL,
     descuento FLOAT NOT NULL,
-    categoria VARCHAR(35) NOT NULL
+    categoria VARCHAR(35) NOT NULL,
+    ruta_imagen VARCHAR(255) NULL
 ) ENGINE=InnoDB;
 
 -- Crear tabla Donacion
@@ -97,7 +98,8 @@ CREATE TABLE Donacion (
     id_donacion INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(35) NOT NULL,
     entidad_donacion VARCHAR(35) NOT NULL,
-    monto_donacion FLOAT NOT NULL
+    monto_donacion FLOAT NOT NULL,
+    ruta_imagen VARCHAR(255) NULL
 ) ENGINE=InnoDB;
 
 -- Crear tabla Canje_Recompensa

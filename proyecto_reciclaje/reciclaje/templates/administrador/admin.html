@@ -8,51 +8,71 @@
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
 <body class="dashboard-body">
-   <header class="dashboard-header">
+  <header class="dashboard-header">
     <h1>Bienvenido, Admin</h1>
-      <nav>
-        <a href="{% url 'admin_panel' %}">Inicio</a>
-        <a href="{% url 'admin_usuarios' %}">Ver Usuarios</a>
-        <a href="{% url 'admin_registros' %}">Ver Registros</a>
-        <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
-        <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
-        <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
-        <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
-          <option value="#">Bitácoras ↓</option>
-          <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
-          <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
-          <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
-        </select>
-        <a href="{% url 'logout' %}">Cerrar Sesión</a>
-      </nav>
-    </header>
+    <nav class="dashboard-navigation-menu">
+      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
+      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
+        <option value="#">Bitácoras ↓</option>
+        <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
+        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
+        <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
+      </select>
+      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
+    </nav>
+  </header>
 
-  <main class="dashboard-main admin-panel">
+  <main class="dashboard-main admin-panel-main">
     {% if messages %}
       {% for message in messages %}
-        <div class="error-message {{ message.tags }}">{{ message }}</div>
+        <div class="admin-panel-message-container admin-panel-message-{{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
-    <div class="admin-card">
-      <section class="admin-card-gif">
-        <h2>Usuarios</h2>
-        <a href="{% url 'admin_usuarios' %}" class="admin-btn">Gestionar</a>
+    <div class="admin-panel-welcome-section">
+      <h2 class="admin-panel-welcome-title">Bienvenido al Panel de Administración</h2>
+      <p class="admin-panel-welcome-date">Fecha y hora actual: {{ current_date_time }}</p>
+    </div>
+    <div class="admin-panel-card-container">
+      <section class="admin-panel-card-section admin-panel-card-users">
+        <img src="{% static 'img/users-icon.png' %}" alt="Usuarios" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Usuarios</h2>
+        <a href="{% url 'admin_usuarios' %}" class="admin-panel-action-button">Gestionar</a>
       </section>
-      <section class="admin-card-gif">
-        <h2>Registros</h2>
-        <a href="{% url 'admin_registros' %}" class="admin-btn">Ver</a>
+      <section class="admin-panel-card-section admin-panel-card-records">
+        <img src="{% static 'img/records-icon.png' %}" alt="Registros" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Registros</h2>
+        <a href="{% url 'admin_registros' %}" class="admin-panel-action-button">Ver</a>
       </section>
-      <section class="admin-card-gif">
-        <h2>Catálogo</h2>
-        <a href="{% url 'admin_catalogo' %}" class="admin-btn">Ver</a>
+      <section class="admin-panel-card-section admin-panel-card-catalog">
+        <img src="{% static 'img/catalog-icon.png' %}" alt="Catálogo" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Catálogo</h2>
+        <a href="{% url 'admin_catalogo' %}" class="admin-panel-action-button">Ver</a>
       </section>
-      <section class="admin-card-gif">
-        <h2>Historial</h2>
-        <a href="{% url 'admin_historial' %}" class="admin-btn">Ver</a>
+      <section class="admin-panel-card-section admin-panel-card-donations">
+        <img src="{% static 'img/donations-icon.png' %}" alt="Donaciones" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Donaciones</h2>
+        <a href="{% url 'admin_donacion' %}" class="admin-panel-action-button">Ver</a>
       </section>
-      <section class="admin-card-gif">
-        <h2>Bitácora</h2>
-        <select name="lista-bitacora" id="lista-bitacora" onchange="redirigirBitacora(this.value)">
+      <section class="admin-panel-card-section admin-panel-card-recycling-points">
+        <img src="{% static 'img/recycling-points-icon.png' %}" alt="Puntos de Reciclaje" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Puntos de Reciclaje</h2>
+        <a href="{% url 'admin_puntos' %}" class="admin-panel-action-button">Ver</a>
+      </section>
+      <section class="admin-panel-card-section admin-panel-card-history">
+        <img src="{% static 'img/history-icon.png' %}" alt="Historial" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Historial de Acceso</h2>
+        <a href="{% url 'admin_historial' %}" class="admin-panel-action-button">Ver</a>
+      </section>
+      <section class="admin-panel-card-section admin-panel-card-log">
+        <img src="{% static 'img/log-icon.png' %}" alt="Bitácora" class="admin-panel-card-image">
+        <h2 class="admin-panel-card-title">Bitácora</h2>
+        <select name="lista-bitacora" id="lista-bitacora" onchange="redirigirBitacora(this.value)" class="admin-panel-bitacora-select">
           <option value="">Seleccionar</option>
           <option value="{% url 'bitacora_reciclaje' %}">Reciclaje</option>
           <option value="{% url 'bitacora_catalogo' %}">Catálogo</option>
