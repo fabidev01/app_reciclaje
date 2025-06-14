@@ -1,4 +1,4 @@
-body{
+body {
     min-height: 100vh;
 }
 .dashboard-body {
@@ -10,35 +10,35 @@ body{
 }
 
 .dashboard-header {
-background-color: #2e7d32;
-color: white;
-padding: 1em 2em;
-display: flex;
-flex-direction: column;
-align-items: center;
+    background-color: #2e7d32;
+    color: white;
+    padding: 1em 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .dashboard-header h1 {
-margin: 0.2em 0;
+    margin: 0.2em 0;
 }
 
 .dashboard-header nav ul {
-list-style: none;
-padding: 0;
-gap: 1em;
+    list-style: none;
+    padding: 0;
+    gap: 1em;
 }
 
 .dashboard-header nav a {
-color: white;
-text-decoration: none;
-font-weight: bold;
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
 }
 
 .dashboard-main .admin-panel {
-padding: 2em;
-display: grid;
-grid-template-columns: auto;
-align-items: center;
+    padding: 2em;
+    display: grid;
+    grid-template-columns: auto;
+    align-items: center;
 }
 
 .dashboard-body {
@@ -96,7 +96,7 @@ align-items: center;
 }
 
 .dashboard-bitacora-select:hover {
-    background-color: #2c3e50;
+    background-color: #ffffff;
 }
 
 /* Estilo para el contenido principal del panel */
@@ -113,7 +113,7 @@ align-items: center;
 }
 
 .admin-panel-message-success {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
 }
 
@@ -210,7 +210,7 @@ align-items: center;
 
 .admin-panel-card-title {
     margin-bottom: 0.5em;
-    color: #4caf50;
+    color: #2e7d32;
     font-size: 20px;
 }
 
@@ -218,7 +218,7 @@ align-items: center;
     display: inline-block;
     margin-top: 1em;
     padding: 0.6em 1.2em;
-    background-color: #4caf50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     text-decoration: none;
     border-radius: 8px;
@@ -227,7 +227,7 @@ align-items: center;
 }
 
 .admin-panel-action-button:hover {
-    background-color: #43a047;
+    background-color: #2c3e50;
     transform: translateY(-2px);
 }
 
@@ -235,7 +235,7 @@ align-items: center;
     width: 100%;
     padding: 0.6em;
     margin-top: 1em;
-    background-color: #4caf50;
+    background-color: #34495e;
     color: white;
     border: none;
     border-radius: 8px;
@@ -244,7 +244,7 @@ align-items: center;
 }
 
 .admin-panel-bitacora-select:hover {
-    background-color: #43a047;
+    background-color: #ffffff;
 }
 
 /* Animaciones */
@@ -259,73 +259,74 @@ align-items: center;
 }
 
 .tabla-usuarios {
-padding: 2em;
-background-color: #f4fdf4;
+    padding: 2em;
+    background-color: #f4fdf4;
 }
 
 .tabla-usuarios h2 {
-color: #2e7d32;
-margin-bottom: 1em;
+    color: #ffffff;
+    margin-bottom: 1em;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
 }
 
 table {
-width: 100%;
-border-collapse: collapse;
-background-color: #fff;
-box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-border-radius: 10px;
-overflow: hidden;
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 10px;
+
 }
 
 thead {
-background-color: #a5d6a7;
-color: #1b5e20;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ffffff;
 }
 
 th, td {
-padding: 1em;
-text-align: center;
-border: 1px solid #ddd;
+    padding: 1em;
+    text-align: center;
+    border: 1px solid #ddd;
 }
 
 td {
-color: #333;
+    color: #333;
 }
 
 .edit-btn, .delete-btn {
-border: none;
-padding: 0.5em 1em;
-margin: 0 0.2em;
-border-radius: 6px;
-cursor: pointer;
-font-weight: bold;
+    border: none;
+    padding: 0.5em 1em;
+    margin: 0 0.2em;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
 }
 
 .edit-btn {
-background-color: #4caf50;
-color: white;
+    background-color: #2e7d32;
+    color: white;
 }
 
 .delete-btn {
-background-color: #e53935;
-color: white;
+    background-color: #e53935;
+    color: white;
 }
 
 .edit-btn:hover {
-background-color: #388e3c;
+    background-color: #2c3e50;
 }
 
 .delete-btn:hover {
-background-color: #c62828;
+    background-color: #c62828;
 }
 .imagen-tabla{
-max-width: 50px;
+    max-width: 50px;
 }
 a{
     padding: 15px;
 }
 #lista-bitacora {
-    background-color: #4caf50;
+    background-color: #ffffff;
     color: white;
     padding: 0.5em 1em;
     border: none;
@@ -337,23 +338,23 @@ a{
     -moz-appearance: none;
     margin-top: 0.5em;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-  }
-  
+}
+
 #lista-bitacora:hover {
-    background-color: #388e3c;
+    background-color: #2c3e50;
 }
 #lista-bitacora-menu {
-    background-color: #2e7d32;
-    color: white;
+    background: linear-gradient(135deg, #c9c9c9, #ffffff);
+    color: rgb(0, 0, 0);
     padding: 0.5em 1em;
-    border: none;
+    border:white;
     font-weight: bold;
     cursor: pointer;
     appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
     margin-top: 0.5em;
-  }
+}
 
 /* Estilo para el contenido principal de usuarios */
 .admin-usuarios-main {
@@ -372,7 +373,7 @@ a{
 }
 
 .admin-usuarios-message-success {
-    background-color: #4CAF50;
+    background-color: #1b5e20;
     color: white;
 }
 
@@ -402,7 +403,8 @@ a{
 }
 
 .admin-usuarios-table th {
-    background-color: #f8f8f8;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
     font-weight: bold;
 }
 
@@ -424,7 +426,7 @@ a{
 
 /* Botón verde para añadir usuario */
 .admin-usuarios-add-user-button-green {
-    background: linear-gradient(135deg, #4CAF50, #45a049);
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 15px 30px;
     border: none;
@@ -433,7 +435,7 @@ a{
     font-size: 16px;
     font-weight: bold;
     transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
     margin-top: 20px;
     display: block;
     margin-left: auto;
@@ -441,9 +443,9 @@ a{
 }
 
 .admin-usuarios-add-user-button-green:hover {
-    background: linear-gradient(135deg, #45a049, #388E3C);
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(76, 175, 80, 0.4);
+    box-shadow: 0 6px 8px rgba(46, 125, 50, 0.4);
 }
 
 /* Contenedor del botón de añadir usuario */
@@ -568,7 +570,7 @@ a{
 
 /* Estilo para el botón de guardar */
 .admin-usuarios-save-btn {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 12px 20px;
     border: none;
@@ -580,7 +582,7 @@ a{
 }
 
 .admin-usuarios-save-btn:hover {
-    background-color: #45a049;
+    background-color: #2c3e50;
 }
 
 /* Estilo para el botón de cierre */
@@ -596,7 +598,7 @@ a{
 .admin-usuarios-close-btn:hover {
     color: #000;
 }
- 
+
 .admin-catalogo-body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f4;
@@ -622,7 +624,7 @@ a{
 }
 
 .admin-catalogo-message-success {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
 }
 
@@ -665,11 +667,12 @@ a{
 }
 
 .admin-catalogo-table th {
-    background-color: #f8f8f8;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     font-weight: bold;
     position: sticky;
     top: 0;
     z-index: 10;
+    color: #fff;
 }
 
 .admin-catalogo-table tr:hover {
@@ -764,7 +767,7 @@ a{
 
 /* Estilo para el botón de guardar */
 .admin-catalogo-save-btn {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 12px 20px;
     border: none;
@@ -776,7 +779,7 @@ a{
 }
 
 .admin-catalogo-save-btn:hover {
-    background-color: #45a049;
+    background-color: #2c3e50;
 }
 
 /* Estilo para el botón de cierre */
@@ -793,17 +796,14 @@ a{
     color: #000;
 }
 
-
-
-
-
+/* Estilo para el botón de añadir */
 .admin-catalogo-add-button-container {
     text-align: center;
     margin-top: 20px;
 }
 
 .admin-catalogo-add-btn {
-    background: linear-gradient(to right, #4CAF50, #45a049);
+    background: linear-gradient(to right, #2e7d32, #2c3e50);
     color: white;
     padding: 15px 30px;
     border: none;
@@ -814,7 +814,7 @@ a{
 }
 
 .admin-catalogo-add-btn:hover {
-    background: linear-gradient(to right, #45a049, #388E3C);
+    background: linear-gradient(to right, #2c3e50, #34495e);
 }
 
 /* Estilo para el botón de eliminar */
@@ -856,7 +856,7 @@ a{
 }
 
 .admin-donacion-message-success {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
 }
 
@@ -899,11 +899,12 @@ a{
 }
 
 .admin-donacion-table th {
-    background-color: #f8f8f8;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     font-weight: bold;
     position: sticky;
     top: 0;
     z-index: 10;
+    color: #fff;
 }
 
 .admin-donacion-table tr:hover {
@@ -944,7 +945,7 @@ a{
 }
 
 .admin-donacion-add-btn {
-    background: linear-gradient(to right, #4CAF50, #45a049);
+    background: linear-gradient(to right, #2e7d32, #2c3e50);
     color: white;
     padding: 15px 30px;
     border: none;
@@ -955,7 +956,7 @@ a{
 }
 
 .admin-donacion-add-btn:hover {
-    background: linear-gradient(to right, #45a049, #388E3C);
+    background: linear-gradient(to right, #2c3e50, #34495e);
 }
 
 /* Estilo para el modal */
@@ -1026,7 +1027,7 @@ a{
 
 /* Estilo para el botón de guardar */
 .admin-donacion-save-btn {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 12px 20px;
     border: none;
@@ -1038,7 +1039,7 @@ a{
 }
 
 .admin-donacion-save-btn:hover {
-    background-color: #45a049;
+    background-color: #2c3e50;
 }
 
 /* Estilo para el botón de cierre */
@@ -1055,8 +1056,7 @@ a{
     color: #000;
 }
 
-
-/* ... (mantén el CSS anterior hasta dashboard-bitacora-select) ... */
+/* ... (mantén el CSS anterior hasta admin-puntos-reciclaje-modal-save-button) ... */
 
 /* Estilo para el contenido principal de Puntos de Reciclaje */
 .dashboard-main.admin-puntos-reciclaje-main-content {
@@ -1086,7 +1086,7 @@ a{
 }
 
 .admin-puntos-reciclaje-message-success {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
 }
 
@@ -1114,9 +1114,9 @@ a{
 }
 
 .admin-puntos-reciclaje-data-table th {
-    background-color: #f5f5f5;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     font-weight: bold;
-    color: #333;
+    color: #fff;
 }
 
 .admin-puntos-reciclaje-data-table tr:hover {
@@ -1133,7 +1133,7 @@ a{
 }
 
 .admin-puntos-reciclaje-add-button-green {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 10px 20px;
     border: none;
@@ -1145,7 +1145,7 @@ a{
 }
 
 .admin-puntos-reciclaje-add-button-green:hover {
-    background-color: #45a049;
+    background-color: #2c3e50;
 }
 
 .admin-puntos-reciclaje-edit-button,
@@ -1262,7 +1262,7 @@ a{
 }
 
 .admin-puntos-reciclaje-modal-save-button {
-    background-color: #4CAF50;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
     padding: 10px;
     border: none;
@@ -1274,7 +1274,7 @@ a{
 }
 
 .admin-puntos-reciclaje-modal-save-button:hover {
-    background-color: #45a049;
+    background-color: #2c3e50;
 }
 
 .admin-puntos-reciclaje-modal-close-button {
@@ -1288,4 +1288,111 @@ a{
 
 .admin-puntos-reciclaje-modal-close-button:hover {
     color: #000;
+}
+
+.header-admin-historial {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-admin-historial-title {
+    margin: 0;
+    font-size: 24px;
+}
+
+.navigation-admin-historial-menu {
+    display: flex;
+    align-items: center;
+}
+
+.navigation-admin-historial-link {
+    color: white;
+    text-decoration: none;
+    margin-left: 20px;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.navigation-admin-historial-link:hover {
+    color: #ecf0f1;
+}
+
+.bitacora-select-admin-historial {
+    margin-left: 20px;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: none;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    cursor: pointer;
+}
+
+.main-content-admin-historial {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.heading-title-admin-historial {
+    font-size: 24px;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.message-container-admin-historial {
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.message-success-admin-historial {
+     background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+}
+
+.message-error-admin-historial {
+    background-color: #f44336;
+    color: white;
+}
+
+.table-container-admin-historial {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.data-table-admin-historial {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.data-table-admin-historial-th,
+.data-table-admin-historial-td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+.data-table-admin-historial-th {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    font-weight: bold;
+    color: #fff;
+}
+
+.data-table-admin-historial-tr:hover {
+    background-color: #f9f9f9;
+}
+
+.data-table-admin-historial-td {
+    color: #555;
 }

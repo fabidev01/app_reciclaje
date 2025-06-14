@@ -3,7 +3,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Historial de Acceso</title>
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
@@ -27,21 +27,48 @@
       <a href="{% url 'logout' %}">Cerrar Sesión</a>
     </nav>
   </header>
-
-  <main class="tabla-usuarios">
-    <h2>Historial de Acceso</h2>
+  <main class="main-content-admin-historial">
     {% if messages %}
       {% for message in messages %}
-        <div class="error-message {{ message.tags }}">{{ message }}</div>
+        <div class="message-container-admin-historial {{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
+    <h2 class="heading-title-admin-historial">Historial de Acceso</h2>
+    <div class="table-container-admin-historial">
+      <table class="data-table-admin-historial">
+        <thead>
+          <tr>
+            <th class="data-table-admin-historial-th">ID</th>
+            <th class="data-table-admin-historial-th">Usuario ID</th>
+            <th class="data-table-admin-historial-th">Tipo de Acceso</th>
+            <th class="data-table-admin-historial-th">Fecha y Hora de Acceso</th>
+            <th class="data-table-admin-historial-th">Resultado</th>
+            <th class="data-table-admin-historial-th">Detalle</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for registro in historial_acceso %}
+            <tr class="data-table-admin-historial-tr">
+              <td class="data-table-admin-historial-td">{{ registro.0 }}</td>
+              <td class="data-table-admin-historial-td">{{ registro.1|default:"N/A" }}</td>
+              <td class="data-table-admin-historial-td">{{ registro.2 }}</td>
+              <td class="data-table-admin-historial-td">{{ registro.3 }}</td>
+              <td class="data-table-admin-historial-td">{{ registro.4 }}</td>
+              <td class="data-table-admin-historial-td">{{ registro.5 }}</td>
+            </tr>
+          {% empty %}
+            <tr class="data-table-admin-historial-tr">
+              <td class="data-table-admin-historial-td" colspan="6">No hay registros de acceso.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <script>
     function redirigirBitacora(url) {
-      if (url) {
-        window.location.href = url;
-      }
+      if (url) window.location.href = url;
     }
   </script>
 </body>

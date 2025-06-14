@@ -17,11 +17,13 @@ from django.urls import reverse
 from django.http import JsonResponse
 import logging
 from datetime import timedelta
+logger = logging.getLogger(__name__)
 
 # Formulario personalizado para login
 class LoginForm(forms.Form):
     email = forms.EmailField(label="Correo", max_length=254)
     password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
+
 class LoginView(FormView):
     template_name = 'usuario_regular/login.html'
     form_class = LoginForm
@@ -40,6 +42,9 @@ class LoginView(FormView):
                 if user and check_password(password, user[1]):
                     self.request.session['user_id'] = user[0]
                     id_rol = user[2]  # id_rol está en el índice 2
+                    # Registrar intento exitoso
+                    cursor.callproc('registrar_intento_login', [user[0], email, 'Éxito', 'Inicio de sesión exitoso'])
+                    connection.commit()
                     if id_rol == 1:  # Administrador
                         messages.success(self.request, 'Inicio de sesión exitoso como Administrador.')
                         return HttpResponseRedirect(reverse_lazy('admin_panel'))
@@ -47,6 +52,9 @@ class LoginView(FormView):
                         messages.success(self.request, f'Inicio de sesión exitoso como usuario regular (Rol ID: {id_rol}).')
                         return HttpResponseRedirect(reverse_lazy('dashboard'))
                 else:
+                    # Registrar intento fallido
+                    cursor.callproc('registrar_intento_login', [None, email, 'Fallido', 'Credenciales incorrectas'])
+                    connection.commit()
                     messages.error(self.request, 'Correo o contraseña incorrectos.')
                     return self.form_invalid(form)
         except Exception as e:
@@ -61,15 +69,29 @@ class LoginView(FormView):
         response['Expires'] = '0'
         return response
 
-# Vista de inicio
-# def inicio(request):
-#     response = render(request, 'usuario_regular/inicio.html')
-#     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-#     response['Pragma'] = 'no-cache'
-#     response['Expires'] = '0'
-#     return response
-
-logger = logging.getLogger(__name__)
+def logout_view(request):
+    user_id = request.session.get('user_id')
+    email = None
+    if user_id:
+        try:
+            with connection.cursor() as cursor:
+                # Obtener el correo del usuario antes de cerrar sesión
+                cursor.execute("SELECT correo FROM Usuario WHERE id_usuario = %s", [user_id])
+                result = cursor.fetchone()
+                if result:
+                    email = result[0]
+                # Registrar el cierre de sesión
+                cursor.callproc('registrar_intento_login', [user_id, email, 'Éxito', 'Cierre de sesión exitoso'])
+                connection.commit()
+        except Exception as e:
+            logger.error(f"Error al registrar cierre de sesión: {str(e)}")
+    logout(request)
+    messages.success(request, 'Sesión cerrada correctamente.')
+    response = redirect('inicio')
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def inicio(request):
     top_recyclers = []
@@ -247,14 +269,7 @@ class ReporteAmbiental:
         return colors.get(material, '#000000')
 
 # Vista de logout
-def logout_view(request):
-    logout(request)
-    messages.success(request, 'Sesión cerrada correctamente.')
-    response = redirect('inicio')
-    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
-    response['Pragma'] = 'no-cache'
-    response['Expires'] = '0'
-    return response
+
 
 # Vista de registro de usuario
 def registro_usuario(request):

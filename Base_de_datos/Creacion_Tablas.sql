@@ -131,7 +131,7 @@ CREATE TABLE Bitacora_Acceso (
     id_bitacora_acceso INT PRIMARY KEY AUTO_INCREMENT,
     id_usuario INT,
     tipo_acceso VARCHAR(35) NOT NULL,
-    fecha_acceso DATE NOT NULL,
+    fecha_acceso DATETIME NOT NULL,
     resultado VARCHAR(35) NOT NULL,
     detalle TEXT,
     FOREIGN KEY (id_usuario) REFERENCES Usuario(id_usuario)
@@ -143,7 +143,7 @@ CREATE TABLE Bitacora_Catalogo (
     ip VARCHAR(45) NULL,
     id_catalogo_recompensa INT NOT NULL,
     accion VARCHAR(35) NOT NULL,
-    fecha_accion DATE NOT NULL,
+    fecha_accion DATETIME NOT NULL,
     detalle TEXT,
     FOREIGN KEY (id_catalogo_recompensa) REFERENCES Catalogo_Recompensa(id_catalogo_recompensa)
 ) ENGINE=InnoDB;
@@ -154,7 +154,7 @@ CREATE TABLE Bitacora_Reciclaje (
     ip VARCHAR(45) NULL,
     id_registro_reciclaje INT NOT NULL,
     accion VARCHAR(35) NOT NULL,
-    fecha_accion DATE NOT NULL,
+    fecha_accion DATETIME NOT NULL,
     detalle TEXT,
     FOREIGN KEY (id_registro_reciclaje) REFERENCES Registro_Reciclaje(id_registro_reciclaje)
 ) ENGINE=InnoDB;
@@ -166,7 +166,7 @@ CREATE TABLE Bitacora_Canje (
     id_canje_recompensa INT NOT NULL,
     id_catalogo_recompensa INT NOT NULL,
     accion VARCHAR(35) NOT NULL,
-    fecha_accion DATE NOT NULL,
+    fecha_accion DATETIME NOT NULL,
     detalle TEXT,
     FOREIGN KEY (id_canje_recompensa) REFERENCES Canje_Recompensa(id_canje_recompensa),
     FOREIGN KEY (id_catalogo_recompensa) REFERENCES Catalogo_Recompensa(id_catalogo_recompensa)

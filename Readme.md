@@ -1,5 +1,6 @@
 Pasos para ajustar la app 
-
+  python -m venv venv
+  pip install django
 1 activar el entorno virtual 
   venv\Scripts\activate
 2 entrar a proyecto_reciclaje

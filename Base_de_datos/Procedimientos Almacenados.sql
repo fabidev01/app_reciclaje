@@ -110,8 +110,11 @@ BEGIN
     INSERT INTO Bitacora_Acceso (id_usuario, tipo_acceso, fecha_acceso, resultado, detalle)
     VALUES (
         p_id_usuario,
-        'Inicio',
-        CURDATE(),
+        CASE 
+            WHEN p_resultado = 'Éxito' AND p_detalle LIKE 'Cierre de sesión%' THEN 'Salir'
+            ELSE 'Inicio'
+        END,
+        NOW(),
         p_resultado,
         CONCAT('Intento de login para ', p_correo, ': ', p_detalle)
     );

@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection
 from datetime import datetime
+import logging
+logger = logging.getLogger(__name__)
 
 def es_admin(request):
     user_id = request.session.get('user_id')
@@ -37,7 +39,11 @@ def admin_panel(request):
             return redirect('login')
 
     current_date_time = datetime.now().strftime("%I:%M %p -%H, %A %d de %B de %Y")
-    return render(request, 'administrador/admin.html', {'current_date_time': current_date_time})
+    response = render(request, 'administrador/admin.html', {'current_date_time': current_date_time})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def admin_usuarios(request):
     if not es_admin(request):
@@ -194,12 +200,12 @@ def admin_usuarios(request):
         'roles': roles,
         'permisos': permisos
     })
-    response['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
 
-# Otras vistas de admin (mantenidas iguales con la lógica corregida)
+# Otras vistas de admin (ajustadas con cabeceras de caché)
 def admin_registros(request):
     if not es_admin(request):
         if request.session.get('user_id'):
@@ -230,7 +236,11 @@ def admin_registros(request):
             registros = cursor.fetchall()
     except Exception as e:
         messages.error(request, f'Error al cargar registros: {str(e)}')
-    return render(request, 'administrador/registros.html', {'registros': registros})
+    response = render(request, 'administrador/registros.html', {'registros': registros})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def admin_catalogo(request):
     if not es_admin(request):
@@ -315,9 +325,13 @@ def admin_catalogo(request):
             recompensas = cursor.fetchall()
     except Exception as e:
         messages.error(request, f"Error al cargar recompensas: {str(e)}")
-    return render(request, 'administrador/admin_catalogo.html', {'recompensas': recompensas})
+    response = render(request, 'administrador/admin_catalogo.html', {'recompensas': recompensas})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
-def admin_donacion(request,):
+def admin_donacion(request):
     if not es_admin(request):
         if request.session.get('user_id'):
             messages.error(request, 'No tienes permisos para acceder a esta página.')
@@ -372,7 +386,11 @@ def admin_donacion(request,):
             donaciones = cursor.fetchall()
     except Exception as e:
         messages.error(request, f"Error al cargar donaciones: {str(e)}")
-    return render(request, 'administrador/admin_donacion.html', {'donaciones': donaciones})
+    response = render(request, 'administrador/admin_donacion.html', {'donaciones': donaciones})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def admin_puntos(request):
     if not es_admin(request):
@@ -476,7 +494,11 @@ def admin_puntos(request):
     except Exception as e:
         messages.error(request, f'Error al procesar puntos de reciclaje: {str(e)}')
 
-    return render(request, 'administrador/admin_puntos.html', {'puntos_reciclaje': puntos_reciclaje, 'materiales': materiales})
+    response = render(request, 'administrador/admin_puntos.html', {'puntos_reciclaje': puntos_reciclaje, 'materiales': materiales})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def admin_historial(request):
     if not es_admin(request):
@@ -485,7 +507,24 @@ def admin_historial(request):
             return redirect('dashboard')
         else:
             return redirect('login')
-    return render(request, 'administrador/admin_historial.html')
+
+    historial_acceso = []
+    try:
+        with connection.cursor() as cursor:
+            # Consulta ajustada para mostrar fecha y hora
+            cursor.execute(
+                "SELECT id_bitacora_acceso, id_usuario, tipo_acceso, DATE_FORMAT(fecha_acceso, '%Y-%m-%d %H:%i:%s') AS fecha_acceso, resultado, detalle FROM Bitacora_Acceso ORDER BY fecha_acceso DESC"
+            )
+            historial_acceso = cursor.fetchall()
+    except Exception as e:
+        messages.error(request, f'Error al cargar el historial: {str(e)}')
+        logger.error(f"Error al obtener historial: {str(e)}")
+
+    response = render(request, 'administrador/admin_historial.html', {'historial_acceso': historial_acceso})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def bitacora_reciclaje(request):
     if not es_admin(request):
@@ -500,14 +539,18 @@ def bitacora_reciclaje(request):
             cursor.execute(
                 """
                 SELECT id_bitacora_reciclaje, ip, id_registro_reciclaje, accion, 
-                       DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y') AS fecha_accion, detalle
+                       DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y %%H:%%i') AS fecha_accion, detalle
                 FROM Bitacora_Reciclaje
                 """
             )
             bitacora = cursor.fetchall()
     except Exception as e:
         messages.error(request, f'Error al cargar bitácora: {str(e)}')
-    return render(request, 'administrador/bitacora_reciclaje.html', {'bitacora': bitacora})
+    response = render(request, 'administrador/bitacora_reciclaje.html', {'bitacora': bitacora})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def bitacora_catalogo(request):
     if not es_admin(request):
@@ -522,14 +565,18 @@ def bitacora_catalogo(request):
             cursor.execute(
                 """
                 SELECT id_bitacora_catalogo, ip, id_catalogo_recompensa, accion, 
-                       DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y') AS fecha_accion, detalle
+                       DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y %%H:%%i') AS fecha_accion, detalle
                 FROM Bitacora_Catalogo
                 """
             )
             bitacora = cursor.fetchall()
     except Exception as e:
         messages.error(request, f'Error al cargar bitácora: {str(e)}')
-    return render(request, 'administrador/bitacora_catalogo.html', {'bitacora': bitacora})
+    response = render(request, 'administrador/bitacora_catalogo.html', {'bitacora': bitacora})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response
 
 def bitacora_canje(request):
     if not es_admin(request):
@@ -544,11 +591,15 @@ def bitacora_canje(request):
             cursor.execute(
                 """
                 SELECT id_bitacora_canje, ip, id_canje_recompensa, id_catalogo_recompensa, accion, 
-                       DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y') AS fecha_accion, detalle
+                       DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y %%H:%%i') AS fecha_accion, detalle
                 FROM Bitacora_Canje
                 """
             )
             bitacora = cursor.fetchall()
     except Exception as e:
         messages.error(request, f'Error al cargar bitácora: {str(e)}')
-    return render(request, 'administrador/bitacora_canje.html', {'bitacora': bitacora})
+    response = render(request, 'administrador/bitacora_canje.html', {'bitacora': bitacora})
+    response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    return response

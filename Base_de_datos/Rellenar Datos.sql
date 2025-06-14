@@ -104,35 +104,36 @@ INSERT INTO Canje_Donacion (id_usuario, id_donacion, estado, fecha_canje, puntos
 
 -- Insertar datos en Bitacora_Acceso
 INSERT INTO Bitacora_Acceso (id_usuario, tipo_acceso, fecha_acceso, resultado, detalle) VALUES
-(1, 'Inicio', STR_TO_DATE('01/03/2025', '%d/%m/%Y'), 'Éxito', 'Intento de login para luis.morales@email.com: Inicio de sesión exitoso'),
-(2, 'Inicio', STR_TO_DATE('02/03/2025', '%d/%m/%Y'), 'Fallido', 'Intento de login para ana.quispe@email.com: Credenciales incorrectas'),
-(3, 'Inicio', STR_TO_DATE('03/03/2025', '%d/%m/%Y'), 'Éxito', 'Intento de login para pedro.vargas@email.com: Inicio de sesión exitoso'),
-(NULL, 'Inicio', STR_TO_DATE('04/03/2025', '%d/%m/%Y'), 'Fallido', 'Intento de login para usuario.inexistente@email.com: Credenciales incorrectas'),
-(5, 'Inicio', STR_TO_DATE('05/03/2025', '%d/%m/%Y'), 'Éxito', 'Intento de login para carlos.mamani@email.com: Inicio de sesión exitoso');
+(1, 'Inicio', STR_TO_DATE('01/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Éxito', 'Intento de login para luis.morales@email.com: Inicio de sesión exitoso'),
+(2, 'Inicio', STR_TO_DATE('02/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Fallido', 'Intento de login para ana.quispe@email.com: Credenciales incorrectas'),
+(3, 'Inicio', STR_TO_DATE('03/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Éxito', 'Intento de login para pedro.vargas@email.com: Inicio de sesión exitoso'),
+(NULL, 'Inicio', STR_TO_DATE('04/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Fallido', 'Intento de login para usuario.inexistente@email.com: Credenciales incorrectas'),
+(5, 'Inicio', STR_TO_DATE('05/03/2025 09:00:00', '%d/%m/%Y %H:%i:%s'), 'Éxito', 'Intento de login para carlos.mamani@email.com: Inicio de sesión exitoso');
 
 -- Insertar datos en Bitacora_Catalogo
 INSERT INTO Bitacora_Catalogo (ip, id_catalogo_recompensa, accion, fecha_accion, detalle) VALUES
-('192.168.1.1', 1, 'INSERT', STR_TO_DATE('01/03/2025', '%d/%m/%Y'), 'Recompensa creada'),
-('192.168.1.2', 2, 'UPDATE', STR_TO_DATE('02/03/2025', '%d/%m/%Y'), 'Stock actualizado'),
-('192.168.1.3', 3, 'DELETE', STR_TO_DATE('03/03/2025', '%d/%m/%Y'), 'Recompensa eliminada'),
-('192.168.1.4', 4, 'INSERT', STR_TO_DATE('04/03/2025', '%d/%m/%Y'), 'Nueva recompensa'),
-('192.168.1.5', 5, 'UPDATE', STR_TO_DATE('05/03/2025', '%d/%m/%Y'), 'Descuento modificado');
+('192.168.1.1', 1, 'INSERT', STR_TO_DATE('01/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Recompensa creada'),
+('192.168.1.2', 2, 'UPDATE', STR_TO_DATE('02/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Stock actualizado'),
+('192.168.1.3', 3, 'DELETE', STR_TO_DATE('03/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Recompensa eliminada'),
+('192.168.1.4', 4, 'INSERT', STR_TO_DATE('04/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Nueva recompensa'),
+('192.168.1.5', 5, 'UPDATE', STR_TO_DATE('05/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Descuento modificado');
+
 
 -- Insertar datos en Bitacora_Reciclaje
 INSERT INTO Bitacora_Reciclaje (ip, id_registro_reciclaje, accion, fecha_accion, detalle) VALUES
-('192.168.1.1', 1, 'UPDATE', STR_TO_DATE('01/03/2025', '%d/%m/%Y'), 'Cantidad modificada'),
-('192.168.1.2', 2, 'DELETE', STR_TO_DATE('02/03/2025', '%d/%m/%Y'), 'Registro eliminado'),
-('192.168.1.3', 3, 'UPDATE', STR_TO_DATE('03/03/2025', '%d/%m/%Y'), 'Subtipo cambiado'),
-('192.168.1.4', 4, 'DELETE', STR_TO_DATE('04/03/2025', '%d/%m/%Y'), 'Registro eliminado'),
-('192.168.1.5', 5, 'UPDATE', STR_TO_DATE('05/03/2025', '%d/%m/%Y'), 'Cantidad ajustada');
+('192.168.1.1', 1, 'UPDATE', STR_TO_DATE('01/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Cantidad modificada'),
+('192.168.1.2', 2, 'DELETE', STR_TO_DATE('02/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Registro eliminado'),
+('192.168.1.3', 3, 'UPDATE', STR_TO_DATE('03/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Subtipo cambiado'),
+('192.168.1.4', 4, 'DELETE', STR_TO_DATE('04/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Registro eliminado'),
+('192.168.1.5', 5, 'UPDATE', STR_TO_DATE('05/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Cantidad ajustada');
 
 -- Insertar datos en Bitacora_Canje
 INSERT INTO Bitacora_Canje (ip, id_canje_recompensa, id_catalogo_recompensa, accion, fecha_accion, detalle) VALUES
-('192.168.1.1', 1, 1, 'UPDATE', STR_TO_DATE('01/03/2025', '%d/%m/%Y'), 'Estado cambiado'),
-('192.168.1.2', 2, 2, 'DELETE', STR_TO_DATE('02/03/2025', '%d/%m/%Y'), 'Canje eliminado'),
-('192.168.1.3', 3, 3, 'UPDATE', STR_TO_DATE('03/03/2025', '%d/%m/%Y'), 'Puntos ajustados'),
-('192.168.1.4', 4, 4, 'DELETE', STR_TO_DATE('04/03/2025', '%d/%m/%Y'), 'Canje eliminado'),
-('192.168.1.5', 5, 5, 'UPDATE', STR_TO_DATE('05/03/2025', '%d/%m/%Y'), 'Estado modificado');
+('192.168.1.1', 1, 1, 'UPDATE', STR_TO_DATE('01/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Estado cambiado'),
+('192.168.1.2', 2, 2, 'DELETE', STR_TO_DATE('02/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Canje eliminado'),
+('192.168.1.3', 3, 3, 'UPDATE', STR_TO_DATE('03/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Puntos ajustados'),
+('192.168.1.4', 4, 4, 'DELETE', STR_TO_DATE('04/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Canje eliminado'),
+('192.168.1.5', 5, 5, 'UPDATE', STR_TO_DATE('05/03/2025 08:00:00', '%d/%m/%Y %H:%i:%s'), 'Estado modificado');
 
 
 INSERT INTO Impacto_Ambiental_Diario (fecha_dia, tipo_basura, unidad_medida, cantidad_reciclada_por_tipo, co2_reducido_por_tipo) VALUES
