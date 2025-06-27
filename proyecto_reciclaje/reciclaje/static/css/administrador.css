@@ -1,51 +1,12 @@
+/* Estilos generales */
 body {
     min-height: 100vh;
-}
-.dashboard-body {
-    font-family: sans-serif;
-    background-color: #d6f0d6;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffffff, #faffe5);
     margin: 0;
+    padding: 0;
     text-align: center;
     justify-content: center;
-}
-
-.dashboard-header {
-    background-color: #2e7d32;
-    color: white;
-    padding: 1em 2em;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.dashboard-header h1 {
-    margin: 0.2em 0;
-}
-
-.dashboard-header nav ul {
-    list-style: none;
-    padding: 0;
-    gap: 1em;
-}
-
-.dashboard-header nav a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-}
-
-.dashboard-main .admin-panel {
-    padding: 2em;
-    display: grid;
-    grid-template-columns: auto;
-    align-items: center;
-}
-
-.dashboard-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
 }
 
 /* Estilo para el encabezado */
@@ -55,10 +16,13 @@ body {
     padding: 15px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .dashboard-header h1 {
-    margin: 0;
+    margin: 0.2em 0;
     font-size: 24px;
     animation: fadeIn 1s ease-in;
 }
@@ -97,27 +61,66 @@ body {
 
 .dashboard-bitacora-select:hover {
     background-color: #ffffff;
+    color: #000;
 }
+
+#lista-bitacora-menu {
+    background: linear-gradient(135deg, #c9c9c9, #ffffff);
+    color: rgb(0, 0, 0);
+    padding: 0.5em 1em;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    margin-top: 0.5em;
+}
+
 
 /* Estilo para el contenido principal del panel */
-.dashboard-main.admin-panel-main {
-    max-width: 1200px;
+.dashboard-main.admin-panel-main,
+.dashboard-main.admin-usuarios-main,
+.dashboard-main.admin-catalogo-main,
+.dashboard-main.admin-donacion-main,
+.dashboard-main.admin-puntos-reciclaje-main-content,
+.main-content-admin-historial {
+    max-width: 100vh;
     margin: 20px auto;
     padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.admin-panel-message-container {
+.admin-panel-message-container,
+.admin-usuarios-message,
+.admin-catalogo-message,
+.admin-donacion-message,
+.admin-puntos-reciclaje-message-container,
+.message-container-admin-historial {
     padding: 10px;
     margin-bottom: 20px;
     border-radius: 5px;
+    font-size: 14px;
 }
 
-.admin-panel-message-success {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
+.admin-panel-message-success,
+.admin-usuarios-message-success,
+.admin-catalogo-message-success,
+.admin-donacion-message-success,
+.admin-puntos-reciclaje-message-success,
+.message-success-admin-historial {
+    background-color: #2e7d32;
     color: white;
 }
 
-.admin-panel-message-error {
+.admin-panel-message-error,
+.admin-usuarios-message-error,
+.admin-catalogo-message-error,
+.admin-donacion-message-error,
+.admin-puntos-reciclaje-message-error,
+.message-error-admin-historial {
     background-color: #f44336;
     color: white;
 }
@@ -179,9 +182,18 @@ body {
     background: linear-gradient(135deg, #ffffff, #ffebee);
 }
 
+.admin-panel-card-roles {
+    background: linear-gradient(135deg, #ffffff, #e8cbf0); 
+}
+
+.admin-panel-card-materials {
+    background: linear-gradient(135deg, #ffffff, #f5e6cb); 
+}
+
 .admin-panel-card-recycling-points {
     background: linear-gradient(135deg, #ffffff, #e0f7fa);
 }
+
 
 .admin-panel-card-history {
     background: linear-gradient(135deg, #ffffff, #f1f8e9);
@@ -196,17 +208,6 @@ body {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.admin-panel-card-image {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 15px;
-    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.1));
-    transition: transform 0.3s ease;
-}
-
-.admin-panel-card-section:hover .admin-panel-card-image {
-    transform: scale(1.1);
-}
 
 .admin-panel-card-title {
     margin-bottom: 0.5em;
@@ -245,37 +246,143 @@ body {
 
 .admin-panel-bitacora-select:hover {
     background-color: #ffffff;
+    color: #000;
 }
 
-/* Animaciones */
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.stats-container {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 1.5em;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    overflow: hidden;
+    margin-top: 20px;
+    background: linear-gradient(135deg, #ffffff, #f9f9f9);
 }
 
-@keyframes slideIn {
-    from { transform: translateY(20px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+.stats-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
-.tabla-usuarios {
+.stats-container h3 {
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 20px;
+}
+
+.stats-container table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.stats-container thead {
+    background: linear-gradient(135deg, #fff5db, #ffffff); /* Degradado verde vibrante */
+    color: #000000;
+}
+
+.stats-container th {
+    padding: 1em;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+.stats-container tbody {
+    background-color: #ffffff;
+}
+
+.stats-container td {
+    padding: 1em;
+    text-align: center;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+/* Ajuste del header para alinear el botón a la derecha */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 24px;
+    animation: fadeIn 1s ease-in;
+}
+
+.parent-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+.logout-container .dashboard-navigation-link {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.logout-container .dashboard-navigation-link:hover {
+    background-color: #34495e;
+    color: #ecf0f1;
+}
+
+/* Eliminar estilos de imágenes ya que no se usarán */
+.admin-panel-card-image {
+    display: none; /* Ocultamos las imágenes */
+}
+
+.parent-container {
+    display: flex;         /* Activa Flexbox */
+    align-items: center;   /* Centra verticalmente el contenido */
+    justify-content: flex-end; /* Alinea el contenido hacia la derecha */
+    padding-right: 10px;   /* Espaciado desde el borde derecho */
+    box-sizing: border-box;/* Asegura que el padding no afecte el tamaño total */
+}
+
+
+/* Tablas generales */
+.tabla-usuarios,
+.admin-usuarios-table-scroll,
+.admin-catalogo-table-scroll,
+.admin-donacion-table-scroll,
+.admin-puntos-reciclaje-table-container,
+.table-container-admin-historial {
     padding: 2em;
-    background-color: #f4fdf4;
+    background-color: #ffffff;
+    overflow-x: auto;
+    margin-bottom: 20px;
 }
 
-.tabla-usuarios h2 {
+.tabla-usuarios h2,
+.admin-puntos-reciclaje-heading-title,
+.heading-title-admin-historial {
     color: #ffffff;
     margin-bottom: 1em;
     background: linear-gradient(135deg, #2c3e50, #34495e);
+    padding: 15px;
+    border-radius: 8px 8px 0 0;
+    font-size: 24px;
+    text-align: center;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
     background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
-
 }
 
 thead {
@@ -283,7 +390,8 @@ thead {
     color: #ffffff;
 }
 
-th, td {
+th,
+td {
     padding: 1em;
     text-align: center;
     border: 1px solid #ddd;
@@ -293,38 +401,54 @@ td {
     color: #333;
 }
 
-.edit-btn, .delete-btn {
+.edit-btn,
+.admin-usuarios-edit-button,
+.admin-catalogo-edit-btn,
+.admin-donacion-edit-btn,
+.admin-puntos-reciclaje-edit-button {
+    background: none;
     border: none;
-    padding: 0.5em 1em;
-    margin: 0 0.2em;
-    border-radius: 6px;
     cursor: pointer;
-    font-weight: bold;
+    font-size: 18px;
+    color: #2196F3;
+    margin: 0 5px;
 }
 
-.edit-btn {
-    background-color: #2e7d32;
-    color: white;
+.edit-btn:hover,
+.admin-usuarios-edit-button:hover,
+.admin-catalogo-edit-btn:hover,
+.admin-donacion-edit-btn:hover,
+.admin-puntos-reciclaje-edit-button:hover {
+    color: #1976D2;
 }
 
-.delete-btn {
-    background-color: #e53935;
-    color: white;
+.delete-btn,
+.admin-catalogo-delete-btn,
+.admin-donacion-delete-btn,
+.admin-puntos-reciclaje-delete-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+    color: #f44336;
+    margin: 0 5px;
 }
 
-.edit-btn:hover {
-    background-color: #2c3e50;
+.delete-btn:hover,
+.admin-catalogo-delete-btn:hover,
+.admin-donacion-delete-btn:hover,
+.admin-puntos-reciclaje-delete-button:hover {
+    color: #d32f2f;
 }
 
-.delete-btn:hover {
-    background-color: #c62828;
-}
-.imagen-tabla{
+.imagen-tabla {
     max-width: 50px;
 }
-a{
+
+a {
     padding: 15px;
 }
+
 #lista-bitacora {
     background-color: #ffffff;
     color: white;
@@ -343,119 +467,12 @@ a{
 #lista-bitacora:hover {
     background-color: #2c3e50;
 }
-#lista-bitacora-menu {
-    background: linear-gradient(135deg, #c9c9c9, #ffffff);
-    color: rgb(0, 0, 0);
-    padding: 0.5em 1em;
-    border:white;
-    font-weight: bold;
-    cursor: pointer;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    margin-top: 0.5em;
-}
 
-/* Estilo para el contenido principal de usuarios */
-.admin-usuarios-main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.admin-usuarios-message {
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.admin-usuarios-message-success {
-    background-color: #1b5e20;
-    color: white;
-}
-
-.admin-usuarios-message-error {
-    background-color: #f44336;
-    color: white;
-}
-
-/* Estilo para la tabla de usuarios */
-.admin-usuarios-table-scroll {
-    max-height: 100vh;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-.admin-usuarios-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.admin-usuarios-table th,
-.admin-usuarios-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.admin-usuarios-table th {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    font-weight: bold;
-}
-
-.admin-usuarios-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-.admin-usuarios-edit-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #2196F3;
-}
-
-.admin-usuarios-edit-button:hover {
-    color: #1976D2;
-}
-
-/* Botón verde para añadir usuario */
-.admin-usuarios-add-user-button-green {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: bold;
-    transition: background 0.3s ease, transform 0.2s ease;
-    box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
-    margin-top: 20px;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.admin-usuarios-add-user-button-green:hover {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(46, 125, 50, 0.4);
-}
-
-/* Contenedor del botón de añadir usuario */
-.admin-usuarios-add-user-container {
-    text-align: center;
-    padding: 15px 0;
-}
-
-/* Estilo para el modal */
-.admin-usuarios-modal {
+/* Modales generales */
+.admin-usuarios-modal,
+.admin-catalogo-modal,
+.admin-donacion-modal,
+.admin-puntos-reciclaje-modal-overlay {
     display: none;
     position: fixed;
     top: 0;
@@ -468,12 +485,17 @@ a{
     align-items: center;
 }
 
-.admin-usuarios-modal.active {
+.admin-usuarios-modal.active,
+.admin-catalogo-modal.active,
+.admin-donacion-modal.active,
+.admin-puntos-reciclaje-modal-overlay.active {
     display: flex;
 }
 
-/* Estilo para el contenido del modal */
-.admin-usuarios-modal-content {
+.admin-usuarios-modal-content,
+.admin-catalogo-modal-content,
+.admin-donacion-modal-content,
+.admin-puntos-reciclaje-modal-content-box {
     background-color: #ffffff;
     padding: 25px;
     border-radius: 10px;
@@ -488,15 +510,19 @@ a{
     line-height: 1.5;
 }
 
-/* Estilo para el título del modal */
-.admin-usuarios-modal-content h2 {
+.admin-usuarios-modal-content h2,
+.admin-catalogo-modal-content h2,
+.admin-donacion-modal-content h2,
+.admin-puntos-reciclaje-modal-title {
     margin-bottom: 20px;
     font-size: 24px;
     color: #333;
 }
 
-/* Estilo para etiquetas y campos */
-.admin-usuarios-modal-content label {
+.admin-usuarios-modal-content label,
+.admin-catalogo-modal-content label,
+.admin-donacion-modal-content label,
+.admin-puntos-reciclaje-modal-label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
@@ -507,7 +533,15 @@ a{
 .admin-usuarios-modal-content input[type="text"],
 .admin-usuarios-modal-content input[type="email"],
 .admin-usuarios-modal-content input[type="password"],
-.admin-usuarios-modal-content input[type="number"] {
+.admin-usuarios-modal-content input[type="number"],
+.admin-catalogo-modal-content input[type="text"],
+.admin-catalogo-modal-content input[type="number"],
+.admin-catalogo-modal-content textarea,
+.admin-donacion-modal-content input[type="text"],
+.admin-donacion-modal-content input[type="number"],
+.admin-donacion-modal-content textarea,
+.admin-donacion-modal-content select,
+.admin-puntos-reciclaje-modal-input {
     width: 100%;
     padding: 10px;
     margin-bottom: 15px;
@@ -517,7 +551,11 @@ a{
     box-sizing: border-box;
 }
 
-/* Estilo para los botones de añadir */
+.admin-catalogo-modal-content textarea,
+.admin-donacion-modal-content textarea {
+    resize: vertical;
+}
+
 .admin-usuarios-add-rol-btn,
 .admin-usuarios-add-permiso-btn {
     background-color: #2196F3;
@@ -536,7 +574,6 @@ a{
     background-color: #1976D2;
 }
 
-/* Estilo para la lista de permisos */
 .admin-usuarios-permisos-list {
     margin-top: 15px;
     margin-bottom: 20px;
@@ -568,728 +605,85 @@ a{
     background-color: #d32f2f;
 }
 
-/* Estilo para el botón de guardar */
-.admin-usuarios-save-btn {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.admin-usuarios-save-btn:hover {
-    background-color: #2c3e50;
-}
-
-/* Estilo para el botón de cierre */
-.admin-usuarios-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-}
-
-.admin-usuarios-close-btn:hover {
-    color: #000;
-}
-
-.admin-catalogo-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-/* Estilo para el main */
-.admin-catalogo-main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo para los mensajes */
-.admin-catalogo-message {
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.admin-catalogo-message-success {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-}
-
-.admin-catalogo-message-error {
-    background-color: #f44336;
-    color: white;
-}
-
-/* Estilo para el título */
-.admin-catalogo-main h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-/* Estilo para el contenedor de la tabla */
-.admin-catalogo-table-scroll {
-    max-height: 400px;
-    overflow-y: auto;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-/* Estilo para la tabla */
-.admin-catalogo-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-}
-
-.admin-catalogo-table th,
-.admin-catalogo-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.admin-catalogo-table th {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    font-weight: bold;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    color: #fff;
-}
-
-.admin-catalogo-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Estilo para la imagen */
-.admin-catalogo-img {
-    width: 50px;
-    height: 50px;
-    object-fit: cover;
-    border-radius: 5px;
-}
-
-/* Estilo para el botón de edición */
-.admin-catalogo-edit-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #2196F3;
-}
-
-.admin-catalogo-edit-btn:hover {
-    color: #1976D2;
-}
-
-/* Estilo para el modal */
-.admin-catalogo-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.admin-catalogo-modal.active {
-    display: flex;
-}
-
-/* Estilo para el contenido del modal */
-.admin-catalogo-modal-content {
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    text-align: left;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-/* Estilo para el título del modal */
-.admin-catalogo-modal-content h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-/* Estilo para etiquetas y campos */
-.admin-catalogo-modal-content label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #444;
-}
-
-.admin-catalogo-modal-content input[type="text"],
-.admin-catalogo-modal-content input[type="number"],
-.admin-catalogo-modal-content textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.admin-catalogo-modal-content textarea {
-    resize: vertical; /* Permitir redimensionar solo verticalmente */
-}
-
-/* Estilo para el botón de guardar */
-.admin-catalogo-save-btn {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.admin-catalogo-save-btn:hover {
-    background-color: #2c3e50;
-}
-
-/* Estilo para el botón de cierre */
-.admin-catalogo-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-}
-
-.admin-catalogo-close-btn:hover {
-    color: #000;
-}
-
-/* Estilo para el botón de añadir */
-.admin-catalogo-add-button-container {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.admin-catalogo-add-btn {
-    background: linear-gradient(to right, #2e7d32, #2c3e50);
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-
-.admin-catalogo-add-btn:hover {
-    background: linear-gradient(to right, #2c3e50, #34495e);
-}
-
-/* Estilo para el botón de eliminar */
-.admin-catalogo-delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #f44336;
-    margin-left: 10px;
-}
-
-.admin-catalogo-delete-btn:hover {
-    color: #d32f2f;
-}
-
-.admin-donacion-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
-}
-
-/* Estilo para el main */
-.admin-donacion-main {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilo para los mensajes */
-.admin-donacion-message {
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-}
-
-.admin-donacion-message-success {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-}
-
-.admin-donacion-message-error {
-    background-color: #f44336;
-    color: white;
-}
-
-/* Estilo para el título */
-.admin-donacion-main h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-/* Estilo para el contenedor de la tabla */
-.admin-donacion-table-scroll {
-    max-height: 400px;
-    overflow-y: auto;
-    width: 100%;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-}
-
-/* Estilo para la tabla */
-.admin-donacion-table {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-}
-
-.admin-donacion-table th,
-.admin-donacion-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.admin-donacion-table th {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    font-weight: bold;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    color: #fff;
-}
-
-.admin-donacion-table tr:hover {
-    background-color: #f1f1f1;
-}
-
-/* Estilo para el botón de edición */
-.admin-donacion-edit-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #2196F3;
-}
-
-.admin-donacion-edit-btn:hover {
-    color: #1976D2;
-}
-
-/* Estilo para el botón de eliminar */
-.admin-donacion-delete-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 18px;
-    color: #f44336;
-    margin-left: 10px;
-}
-
-.admin-donacion-delete-btn:hover {
-    color: #d32f2f;
-}
-
-/* Estilo para el contenedor del botón de añadir */
-.admin-donacion-add-button-container {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.admin-donacion-add-btn {
-    background: linear-gradient(to right, #2e7d32, #2c3e50);
-    color: white;
-    padding: 15px 30px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background 0.3s ease;
-}
-
-.admin-donacion-add-btn:hover {
-    background: linear-gradient(to right, #2c3e50, #34495e);
-}
-
-/* Estilo para el modal */
-.admin-donacion-modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.admin-donacion-modal.active {
-    display: flex;
-}
-
-/* Estilo para el contenido del modal */
-.admin-donacion-modal-content {
-    background-color: #ffffff;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 600px;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    text-align: left;
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-/* Estilo para el título del modal */
-.admin-donacion-modal-content h2 {
-    margin-bottom: 20px;
-    font-size: 24px;
-    color: #333;
-}
-
-/* Estilo para etiquetas y campos */
-.admin-donacion-modal-content label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
-    color: #444;
-}
-
-.admin-donacion-modal-content input[type="text"],
-.admin-donacion-modal-content input[type="number"],
-.admin-donacion-modal-content textarea,
-.admin-donacion-modal-content select {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.admin-donacion-modal-content textarea {
-    resize: vertical;
-}
-
-/* Estilo para el botón de guardar */
-.admin-donacion-save-btn {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    width: 100%;
-    margin-top: 20px;
-}
-
-.admin-donacion-save-btn:hover {
-    background-color: #2c3e50;
-}
-
-/* Estilo para el botón de cierre */
-.admin-donacion-close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #666;
-}
-
-.admin-donacion-close-btn:hover {
-    color: #000;
-}
-
-/* ... (mantén el CSS anterior hasta admin-puntos-reciclaje-modal-save-button) ... */
-
-/* Estilo para el contenido principal de Puntos de Reciclaje */
-.dashboard-main.admin-puntos-reciclaje-main-content {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.admin-puntos-reciclaje-heading-title {
-    font-size: 24px;
-    color: #fff;
-    margin-bottom: 20px;
-    text-align: center;
-    padding: 15px;
-    background: linear-gradient(135deg, #2c3e50, #34495e); /* Mismo color que el nav */
-    border-radius: 8px 8px 0 0;
-}
-
-.admin-puntos-reciclaje-message-container {
-    padding: 10px;
-    margin-bottom: 20px;
-    border-radius: 5px;
-    font-size: 14px;
-}
-
-.admin-puntos-reciclaje-message-success {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-}
-
-.admin-puntos-reciclaje-message-error {
-    background-color: #f44336;
-    color: white;
-}
-
-.admin-puntos-reciclaje-table-container {
-    overflow-x: auto;
-    margin-bottom: 20px;
-}
-
-.admin-puntos-reciclaje-data-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-.admin-puntos-reciclaje-data-table th,
-.admin-puntos-reciclaje-data-table td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.admin-puntos-reciclaje-data-table th {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    font-weight: bold;
-    color: #fff;
-}
-
-.admin-puntos-reciclaje-data-table tr:hover {
-    background-color: #f9f9f9;
-}
-
-.admin-puntos-reciclaje-data-table td {
-    color: #555;
-}
-
-.admin-puntos-reciclaje-action-container {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.admin-puntos-reciclaje-add-button-green {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 500;
-    transition: background-color 0.3s ease;
-}
-
-.admin-puntos-reciclaje-add-button-green:hover {
-    background-color: #2c3e50;
-}
-
-.admin-puntos-reciclaje-edit-button,
-.admin-puntos-reciclaje-delete-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-size: 16px;
-    margin: 0 5px;
-    transition: color 0.3s ease;
-}
-
-.admin-puntos-reciclaje-edit-button {
-    color: #ff9800; /* Color similar al lápiz de la imagen */
-}
-
-.admin-puntos-reciclaje-edit-button:hover {
-    color: #f57c00;
-}
-
-.admin-puntos-reciclaje-delete-button {
-    color: #f44336;
-}
-
-.admin-puntos-reciclaje-delete-button:hover {
-    color: #d32f2f;
-}
-
-/* Modal para añadir y editar */
-.admin-puntos-reciclaje-modal-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
-    justify-content: center;
-    align-items: center;
-}
-
-.admin-puntos-reciclaje-modal-overlay.active {
-    display: flex;
-}
-
-.admin-puntos-reciclaje-modal-content-box {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    max-width: 400px;
-    max-height: 80vh;
-    overflow-y: auto;
-    position: relative;
-    text-align: left;
-    font-size: 14px;
-}
-
-.admin-puntos-reciclaje-modal-title {
-    margin-bottom: 20px;
-    font-size: 18px;
-    color: #333;
-    font-weight: 600;
-}
-
-.admin-puntos-reciclaje-modal-field {
-    margin-bottom: 15px;
-}
-
-.admin-puntos-reciclaje-modal-label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #444;
-}
-
-.admin-puntos-reciclaje-modal-input {
-    width: 100%;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-.admin-puntos-reciclaje-modal-material-list {
-    max-height: 150px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 15px;
-}
-
-.admin-puntos-reciclaje-modal-material-item {
-    display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.admin-puntos-reciclaje-modal-checkbox-label {
-    margin-right: 10px;
-    flex: 1;
-}
-
-.admin-puntos-reciclaje-modal-condition-input {
-    flex: 2;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
-
+.admin-usuarios-save-btn,
+.admin-catalogo-save-btn,
+.admin-donacion-save-btn,
 .admin-puntos-reciclaje-modal-save-button {
     background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
-    padding: 10px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 4px;
+    border-radius: 5px;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 16px;
     width: 100%;
+    margin-top: 20px;
     transition: background-color 0.3s ease;
 }
 
+.admin-usuarios-save-btn:hover,
+.admin-catalogo-save-btn:hover,
+.admin-donacion-save-btn:hover,
 .admin-puntos-reciclaje-modal-save-button:hover {
     background-color: #2c3e50;
 }
 
+.admin-usuarios-close-btn,
+.admin-catalogo-close-btn,
+.admin-donacion-close-btn,
 .admin-puntos-reciclaje-modal-close-button {
     position: absolute;
     top: 10px;
     right: 15px;
-    font-size: 20px;
+    font-size: 24px;
     cursor: pointer;
     color: #666;
 }
 
+.admin-usuarios-close-btn:hover,
+.admin-catalogo-close-btn:hover,
+.admin-donacion-close-btn:hover,
 .admin-puntos-reciclaje-modal-close-button:hover {
     color: #000;
 }
 
+.admin-usuarios-add-user-button-green,
+.admin-catalogo-add-btn,
+.admin-donacion-add-btn,
+.admin-puntos-reciclaje-add-button-green {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s ease, transform 0.2s ease;
+    box-shadow: 0 4px 6px rgba(46, 125, 50, 0.3);
+    margin-top: 20px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.admin-usuarios-add-user-button-green:hover,
+.admin-catalogo-add-btn:hover,
+.admin-donacion-add-btn:hover,
+.admin-puntos-reciclaje-add-button-green:hover {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(46, 125, 50, 0.4);
+}
+
+.admin-catalogo-add-button-container,
+.admin-donacion-add-button-container,
+.admin-puntos-reciclaje-action-container {
+    text-align: center;
+    padding: 15px 0;
+}
+
+/* Historial */
 .header-admin-historial {
     background: linear-gradient(135deg, #2c3e50, #34495e);
     color: white;
@@ -1328,71 +722,44 @@ a{
     border-radius: 4px;
     border: none;
     background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
+    color: rgb(0, 0, 0);
     cursor: pointer;
 }
 
-.main-content-admin-historial {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-.heading-title-admin-historial {
-    font-size: 24px;
-    color: #2c3e50;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.message-container-admin-historial {
-    padding: 10px;
-    margin-bottom: 20px;
+/* Estilo para imágenes en tablas (catálogo y donaciones) */
+.admin-catalogo-img,
+.admin-donacion-img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
     border-radius: 5px;
-    font-size: 14px;
+    vertical-align: middle; /* Alinear verticalmente en la celda */
 }
 
-.message-success-admin-historial {
-     background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
+/* Asegurar que las celdas de la tabla no se vean afectadas por el tamaño de la imagen */
+.admin-catalogo-table td,
+.admin-donacion-table td {
+    max-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.message-error-admin-historial {
-    background-color: #f44336;
-    color: white;
+.admin-catalogo-table img,
+.admin-donacion-table img {
+    max-width: 50px;
+    max-height: 50px;
+    display: block; /* Evitar espacios extra debajo de la imagen */
 }
 
-.table-container-admin-historial {
-    overflow-x: auto;
-    margin-bottom: 20px;
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-.data-table-admin-historial {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
+@keyframes slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
 
-.data-table-admin-historial-th,
-.data-table-admin-historial-td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-}
-
-.data-table-admin-historial-th {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    font-weight: bold;
-    color: #fff;
-}
-
-.data-table-admin-historial-tr:hover {
-    background-color: #f9f9f9;
-}
-
-.data-table-admin-historial-td {
-    color: #555;
-}

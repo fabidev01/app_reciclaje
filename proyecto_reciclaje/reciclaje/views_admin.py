@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.db import connection
 from datetime import datetime
+from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator
 import logging
 logger = logging.getLogger(__name__)
 
@@ -39,11 +41,176 @@ def admin_panel(request):
             return redirect('login')
 
     current_date_time = datetime.now().strftime("%I:%M %p -%H, %A %d de %B de %Y")
-    response = render(request, 'administrador/admin.html', {'current_date_time': current_date_time})
+    stats = {}
+    try:
+        with connection.cursor() as cursor:
+            # Contar usuarios
+            cursor.execute("SELECT COUNT(*) FROM Usuario")
+            stats['usuarios'] = cursor.fetchone()[0]
+
+            # Contar materiales reciclables
+            cursor.execute("SELECT COUNT(*) FROM Material_Reciclable")
+            stats['materiales'] = cursor.fetchone()[0]
+
+            # Contar puntos de reciclaje
+            cursor.execute("SELECT COUNT(*) FROM Punto_Reciclaje")
+            stats['puntos'] = cursor.fetchone()[0]
+
+            # Contar registros de reciclaje
+            cursor.execute("SELECT COUNT(*) FROM Registro_Reciclaje")
+            stats['registros'] = cursor.fetchone()[0]
+
+            # Contar recompensas en catálogo
+            cursor.execute("SELECT COUNT(*) FROM Catalogo_Recompensa")
+            stats['catalogo'] = cursor.fetchone()[0]
+
+            # Contar donaciones
+            cursor.execute("SELECT COUNT(*) FROM Donacion")
+            stats['donaciones'] = cursor.fetchone()[0]
+
+    except Exception as e:
+        messages.error(request, f'Error al cargar las estadísticas: {str(e)}')
+
+    response = render(request, 'administrador/admin_panel.html', {
+        'current_date_time': current_date_time,
+        'stats': stats
+    })
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
+def admin_rol(request):
+    if not es_admin(request):
+        if request.session.get('user_id'):
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return HttpResponseRedirect('dashboard')
+        else:
+            return HttpResponseRedirect('login')
+
+    roles = []
+    permisos = []
+    try:
+        with connection.cursor() as cursor:
+            # Obtener todos los roles con descripción y nombres de permisos
+            cursor.execute("""
+                SELECT r.id_rol, r.nombre, r.descripcion, GROUP_CONCAT(p.nombre SEPARATOR ', ') as permisos
+                FROM Rol r
+                LEFT JOIN Rol_Permiso rp ON r.id_rol = rp.id_rol
+                LEFT JOIN Permiso p ON rp.id_permiso = p.id_permiso
+                GROUP BY r.id_rol, r.nombre, r.descripcion
+            """)
+            roles = cursor.fetchall()
+
+            # Obtener todos los permisos disponibles con IDs y nombres
+            cursor.execute("SELECT id_permiso, nombre FROM Permiso")
+            permisos = dict(cursor.fetchall())
+
+        if request.method == 'POST':
+            action = request.POST.get('action')
+            with connection.cursor() as cursor:
+                if action == 'add':
+                    nombre = request.POST.get('nombre')
+                    descripcion = request.POST.get('descripcion')
+                    permisos_ids = request.POST.get('permisos', '').split(',')
+                    print(f"Permisos recibidos (Añadir): {permisos_ids}")  # Depuración
+                    if nombre and descripcion:
+                        try:
+                            cursor.callproc('insertar_rol', [nombre, descripcion])
+                            cursor.execute("SELECT LAST_INSERT_ID()")
+                            rol_id = cursor.fetchone()[0]
+                            if not rol_id:
+                                raise Exception("No se pudo obtener el ID del rol recién creado.")
+                            connection.commit()
+                            valid_permisos_ids = [int(pid) for pid in permisos_ids if pid.isdigit() and pid]
+                            print(f"Permisos válidos a insertar (Añadir): {valid_permisos_ids}")
+                            if valid_permisos_ids:
+                                for permiso_id in valid_permisos_ids:
+                                    cursor.callproc('insertar_rol_permiso', [rol_id, permiso_id])
+                            connection.commit()
+                            messages.success(request, 'Rol añadido correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al añadir el rol: {str(e)}')
+                    else:
+                        messages.error(request, 'El nombre y la descripción del rol no pueden estar vacíos.')
+                elif action == 'update':
+                    rol_id = request.POST.get('id_rol')
+                    nombre = request.POST.get('nombre')
+                    descripcion = request.POST.get('descripcion')
+                    permisos_ids = request.POST.get('permisos', '').split(',')
+                    print(f"Permisos recibidos (Editar): {permisos_ids}")  # Depuración
+                    if rol_id and nombre and descripcion:
+                        try:
+                            cursor.callproc('actualizar_rol', [rol_id, nombre, descripcion])
+                            cursor.execute("DELETE FROM Rol_Permiso WHERE id_rol = %s", [rol_id])
+                            valid_permisos_ids = [int(pid) for pid in permisos_ids if pid.isdigit() and pid]
+                            print(f"Permisos válidos a insertar (Editar): {valid_permisos_ids}")
+                            if valid_permisos_ids:
+                                for permiso_id in valid_permisos_ids:
+                                    cursor.callproc('insertar_rol_permiso', [rol_id, permiso_id])
+                            connection.commit()
+                            messages.success(request, 'Rol modificado correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al modificar el rol: {str(e)}')
+                    else:
+                        messages.error(request, 'El nombre y la descripción del rol no pueden estar vacíos.')
+                elif action == 'delete':
+                    rol_id = request.POST.get('id_rol')
+                    if rol_id:
+                        try:
+                            cursor.execute("DELETE FROM Rol_Permiso WHERE id_rol = %s", [rol_id])
+                            cursor.callproc('eliminar_rol', [rol_id])
+                            connection.commit()
+                            messages.success(request, 'Rol eliminado correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al eliminar el rol: {str(e)}')
+                elif action == 'add_permiso':
+                    nombre_permiso = request.POST.get('nombre_permiso')
+                    if nombre_permiso:
+                        try:
+                            cursor.callproc('insertar_permiso', [nombre_permiso])
+                            connection.commit()
+                            messages.success(request, 'Permiso añadido correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al añadir el permiso: {str(e)}')
+                    else:
+                        messages.error(request, 'El nombre del permiso no puede estar vacío.')
+                elif action == 'update_permiso':
+                    permiso_id = request.POST.get('id_permiso')
+                    nombre_permiso = request.POST.get('nombre_permiso')
+                    if permiso_id and nombre_permiso:
+                        try:
+                            cursor.callproc('actualizar_permiso', [permiso_id, nombre_permiso])
+                            connection.commit()
+                            messages.success(request, 'Permiso modificado correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al modificar el permiso: {str(e)}')
+                    else:
+                        messages.error(request, 'El nombre del permiso no puede estar vacío.')
+                elif action == 'delete_permiso':
+                    permiso_id = request.POST.get('id_permiso')
+                    if permiso_id:
+                        try:
+                            cursor.callproc('eliminar_permiso', [permiso_id])
+                            connection.commit()
+                            messages.success(request, 'Permiso eliminado correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al eliminar el permiso: {str(e)}')
+            return redirect('admin_rol')
+
+    except Exception as e:
+        messages.error(request, f'Error al cargar los datos: {str(e)}')
+
+    return render(request, 'administrador/admin_rol.html', {
+        'roles': roles,
+        'permisos_disponibles': permisos.items()
+    })
 
 def admin_usuarios(request):
     if not es_admin(request):
@@ -204,20 +371,41 @@ def admin_usuarios(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
-
 # Otras vistas de admin (ajustadas con cabeceras de caché)
 def admin_registros(request):
     if not es_admin(request):
         if request.session.get('user_id'):
             messages.error(request, 'No tienes permisos para acceder a esta página.')
-            return redirect('dashboard')
+            return HttpResponseRedirect('dashboard')
         else:
-            return redirect('login')
+            return HttpResponseRedirect('login')
+    
     registros = []
+    material_stats = []
+    user_activity = []
+    impacto_ambiental = []
+    total_co2_all = 0
+    total_puntos_all = 0
+    total_kg_all = 0
+    max_puntos_material = None
+
+    # Filtros
+    reg_user_filter = request.GET.get('reg_user_filter', '')  # Filtrar usuario
+    reg_material_filter = request.GET.get('reg_material_filter', '')  # Filtrar material
+    reg_puntos_filter = request.GET.get('reg_puntos_filter', '')  # Filtro de puntos
+    reg_day_filter = request.GET.get('reg_day_filter', '')  # Filtro por día
+    reg_month_filter = request.GET.get('reg_month_filter', '')  # Filtro por mes
+    reg_year_filter = request.GET.get('reg_year_filter', '')  # Filtro por año
+    reg_point_filter = request.GET.get('reg_point_filter', '')  # Filtro por punto
+    user_filter = request.GET.get('user_filter', '')  # Filtrar usuario en actividad
+    impacto_mes_filter = request.GET.get('impacto_mes_filter', '')  # Filtro por mes para impacto
+    impacto_anno_filter = request.GET.get('impacto_anno_filter', '')  # Filtro por año para impacto
+    order_by = request.GET.get('order_by', '')  # Criterio de ordenamiento
+
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                """
+            # Consulta de registros con filtros combinables
+            query = """
                 SELECT 
                     rr.id_registro_reciclaje,
                     u.nombre AS nombre_usuario,
@@ -226,17 +414,205 @@ def admin_registros(request):
                     rr.cantidad_kg,
                     rr.puntos_obtenidos,
                     rr.co2_reducido,
-                    rr.fecha_registro,
-                    rr.nombre_subtipo AS nombre_material
+                    mr.nombre AS nombre_material,
+                    rr.fecha_registro
                 FROM Registro_Reciclaje rr
                 LEFT JOIN Usuario u ON rr.id_usuario = u.id_usuario
                 LEFT JOIN Punto_Reciclaje pr ON rr.id_punto_reciclaje = pr.id_punto_reciclaje
+                LEFT JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
+                WHERE 1=1
+            """
+            params = []
+            if reg_user_filter:
+                query += " AND (u.id_usuario = %s OR u.correo LIKE %s OR u.nombre LIKE %s)"
+                try:
+                    user_id = int(reg_user_filter) if reg_user_filter.isdigit() else None
+                    params.append(user_id if user_id else reg_user_filter)
+                except ValueError:
+                    params.append(reg_user_filter)
+                params.extend(['%' + reg_user_filter + '%', '%' + reg_user_filter + '%'])
+            if reg_material_filter:
+                query += " AND (mr.id_material_reciclable = %s OR mr.nombre LIKE %s)"
+                try:
+                    material_id = int(reg_material_filter) if reg_material_filter.isdigit() else None
+                    params.append(material_id if material_id else reg_material_filter)
+                except ValueError:
+                    params.append(reg_material_filter)
+                params.append('%' + reg_material_filter + '%')
+            if reg_puntos_filter:
+                query += " AND (rr.puntos_obtenidos = %s)"
+                try:
+                    puntos = float(reg_puntos_filter) if reg_puntos_filter.replace('.', '').isdigit() else None
+                    params.append(puntos if puntos else reg_puntos_filter)
+                except ValueError:
+                    params.append(reg_puntos_filter)
+            # Filtros de fecha independientes
+            if reg_day_filter:
+                query += " AND DAY(rr.fecha_registro) = %s"
+                try:
+                    day = int(reg_day_filter)
+                    if 1 <= day <= 31:
+                        params.append(day)
+                    else:
+                        messages.error(request, 'Día inválido. Use un valor entre 1 y 31.')
+                except ValueError:
+                    messages.error(request, 'Día inválido. Use un valor numérico.')
+            if reg_month_filter:
+                query += " AND MONTH(rr.fecha_registro) = %s"
+                try:
+                    month = int(reg_month_filter)
+                    if 1 <= month <= 12:
+                        params.append(month)
+                    else:
+                        messages.error(request, 'Mes inválido. Use un valor entre 1 y 12.')
+                except ValueError:
+                    messages.error(request, 'Mes inválido. Use un valor numérico.')
+            if reg_year_filter:
+                query += " AND YEAR(rr.fecha_registro) = %s"
+                try:
+                    year = int(reg_year_filter)
+                    params.append(year)
+                except ValueError:
+                    messages.error(request, 'Año inválido. Use un valor numérico.')
+            if reg_point_filter:
+                query += " AND (pr.id_punto_reciclaje = %s OR pr.nombre LIKE %s)"
+                try:
+                    point_id = int(reg_point_filter) if reg_point_filter.isdigit() else None
+                    params.append(point_id if point_id else reg_point_filter)
+                except ValueError:
+                    params.append(reg_point_filter)
+                params.append('%' + reg_point_filter + '%')
+            # Ordenamiento de mayor a menor
+            if order_by:
+                order_mapping = {
+                    'kg': 'rr.cantidad_kg DESC',
+                    'puntos': 'rr.puntos_obtenidos DESC',
+                    'co2': 'rr.co2_reducido DESC',
+                    'fecha': 'rr.fecha_registro DESC'
+                }
+                order_field = order_mapping.get(order_by, 'rr.id_registro_reciclaje')
+                query += f" ORDER BY {order_field}"
+            cursor.execute(query, params)
+            registros = cursor.fetchall()
+
+            # Total por tipo de material
+            cursor.execute(
+                """
+                SELECT 
+                    mr.nombre,
+                    SUM(rr.cantidad_kg) AS total_kg,
+                    SUM(rr.co2_reducido) AS total_co2,
+                    SUM(rr.puntos_obtenidos) AS total_puntos
+                FROM Registro_Reciclaje rr
+                JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
+                GROUP BY mr.nombre
+                ORDER BY total_kg DESC
                 """
             )
-            registros = cursor.fetchall()
+            material_stats = cursor.fetchall()
+
+            # Totales generales
+            cursor.execute(
+                """
+                SELECT 
+                    SUM(co2_reducido) AS total_co2, 
+                    SUM(puntos_obtenidos) AS total_puntos,
+                    SUM(cantidad_kg) AS total_kg
+                FROM Registro_Reciclaje
+                """
+            )
+            result = cursor.fetchone()
+            total_co2_all = round(result[0], 3) if result[0] else 0
+            total_puntos_all = round(result[1], 3) if result[1] else 0
+            total_kg_all = round(result[2], 3) if result[2] else 0
+
+            # Material con mayor puntos
+            cursor.execute(
+                """
+                SELECT mr.nombre, SUM(rr.puntos_obtenidos) AS max_puntos
+                FROM Registro_Reciclaje rr
+                JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
+                GROUP BY mr.nombre
+                ORDER BY max_puntos DESC
+                LIMIT 1
+                """
+            )
+            max_puntos_material = cursor.fetchone()
+
+            # Actividad de usuario solo si hay filtro
+            if user_filter:
+                query = """
+                    SELECT 
+                        u.nombre AS usuario,
+                        mr.nombre AS material,
+                        SUM(rr.cantidad_kg) AS total_kg,
+                        SUM(rr.puntos_obtenidos) AS total_puntos,
+                        SUM(rr.co2_reducido) AS total_co2
+                    FROM Registro_Reciclaje rr
+                    JOIN Usuario u ON rr.id_usuario = u.id_usuario
+                    JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
+                    WHERE (u.id_usuario = %s OR u.correo LIKE %s OR u.nombre LIKE %s)
+                    GROUP BY u.id_usuario, mr.id_material_reciclable
+                """
+                try:
+                    user_id = int(user_filter) if user_filter.isdigit() else None
+                    params = [user_id if user_id else user_filter, '%' + user_filter + '%', '%' + user_filter + '%']
+                except ValueError:
+                    params = [user_filter, '%' + user_filter + '%', '%' + user_filter + '%']
+                cursor.execute(query, params)
+                user_activity = cursor.fetchall()
+
+            # Impacto ambiental diario: solo el día actual a menos que se apliquen filtros
+            current_date = datetime.now().date()  # 04:29 PM -04 on Thursday, June 26, 2025
+            query = """
+                SELECT 
+                    id_impacto_ambiental_diario,
+                    fecha_dia,
+                    tipo_basura,
+                    unidad_medida,
+                    cantidad_reciclada_por_tipo,
+                    co2_reducido_por_tipo
+                FROM Impacto_Ambiental_Diario
+                WHERE 1=1
+            """
+            params = []
+            if not impacto_mes_filter and not impacto_anno_filter:
+                query += " AND DATE(fecha_dia) = %s"
+                params.append(current_date)
+            elif impacto_mes_filter:
+                query += " AND MONTH(fecha_dia) = %s"
+                params.append(impacto_mes_filter)
+            if impacto_anno_filter:
+                query += " AND YEAR(fecha_dia) = %s"
+                params.append(impacto_anno_filter)
+            query += " ORDER BY fecha_dia DESC"
+            cursor.execute(query, params)
+            impacto_ambiental = cursor.fetchall()
+
     except Exception as e:
         messages.error(request, f'Error al cargar registros: {str(e)}')
-    response = render(request, 'administrador/registros.html', {'registros': registros})
+
+    response = render(request, 'administrador/registros.html', {
+        'registros': registros,
+        'material_stats': material_stats,
+        'total_co2_all': total_co2_all,
+        'total_puntos_all': total_puntos_all,
+        'total_kg_all': total_kg_all,
+        'max_puntos_material': max_puntos_material,
+        'user_activity': user_activity,
+        'reg_user_filter': reg_user_filter,
+        'reg_material_filter': reg_material_filter,
+        'reg_puntos_filter': reg_puntos_filter,
+        'reg_day_filter': reg_day_filter,
+        'reg_month_filter': reg_month_filter,
+        'reg_year_filter': reg_year_filter,
+        'reg_point_filter': reg_point_filter,
+        'user_filter': user_filter,
+        'impacto_ambiental': impacto_ambiental,
+        'impacto_mes_filter': impacto_mes_filter,
+        'impacto_anno_filter': impacto_anno_filter,
+        'order_by': order_by
+    })
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
@@ -391,6 +767,92 @@ def admin_donacion(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
+def admin_material(request):
+    if not es_admin(request):
+        if request.session.get('user_id'):
+            messages.error(request, 'No tienes permisos para acceder a esta página.')
+            return HttpResponseRedirect('dashboard')
+        else:
+            return HttpResponseRedirect('login')
+
+    materiales = []
+    try:
+        with connection.cursor() as cursor:
+            if request.method == 'POST':
+                action = request.POST.get('action')
+                if action == 'add':
+                    nombre = request.POST.get('nombre')
+                    puntos_por_unidad = request.POST.get('puntos_por_unidad')
+                    co2_por_unidad = request.POST.get('co2_por_unidad')
+                    unidad_medida = request.POST.get('unidad_medida')
+                    if nombre and puntos_por_unidad and co2_por_unidad and unidad_medida:
+                        try:
+                            cursor.execute(
+                                """
+                                INSERT INTO Material_Reciclable (nombre, puntos_por_unidad, co2_por_unidad, unidad_medida)
+                                VALUES (%s, %s, %s, %s)
+                                """,
+                                [nombre, puntos_por_unidad, co2_por_unidad, unidad_medida]
+                            )
+                            connection.commit()
+                            messages.success(request, 'Material añadido correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al añadir el material: {str(e)}')
+                    else:
+                        messages.error(request, 'Todos los campos son obligatorios.')
+                elif action == 'update':
+                    id_material = request.POST.get('id_material')
+                    nombre = request.POST.get('nombre')
+                    puntos_por_unidad = request.POST.get('puntos_por_unidad')
+                    co2_por_unidad = request.POST.get('co2_por_unidad')
+                    unidad_medida = request.POST.get('unidad_medida')
+                    if id_material and nombre and puntos_por_unidad and co2_por_unidad and unidad_medida:
+                        try:
+                            cursor.execute(
+                                """
+                                UPDATE Material_Reciclable 
+                                SET nombre = %s, puntos_por_unidad = %s, co2_por_unidad = %s, unidad_medida = %s
+                                WHERE id_material_reciclable = %s
+                                """,
+                                [nombre, puntos_por_unidad, co2_por_unidad, unidad_medida, id_material]
+                            )
+                            connection.commit()
+                            messages.success(request, 'Material modificado correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al modificar el material: {str(e)}')
+                    else:
+                        messages.error(request, 'Todos los campos son obligatorios.')
+                elif action == 'delete':
+                    id_material = request.POST.get('id_material')
+                    if id_material:
+                        try:
+                            cursor.execute("DELETE FROM Material_Punto_Reciclaje WHERE id_material_reciclable = %s", [id_material])
+                            cursor.execute("DELETE FROM Material_Reciclable WHERE id_material_reciclable = %s", [id_material])
+                            connection.commit()
+                            messages.success(request, 'Material eliminado correctamente.')
+                        except Exception as e:
+                            connection.rollback()
+                            messages.error(request, f'Error al eliminar el material: {str(e)}')
+                return redirect('admin_material')
+
+            # Obtener todos los materiales
+            cursor.execute(
+                """
+                SELECT id_material_reciclable, nombre, puntos_por_unidad, co2_por_unidad, unidad_medida
+                FROM Material_Reciclable
+                """
+            )
+            materiales = cursor.fetchall()
+
+    except Exception as e:
+        messages.error(request, f'Error al cargar los materiales: {str(e)}')
+
+    return render(request, 'administrador/admin_material.html', {
+        'materiales': materiales
+    })
 
 def admin_puntos(request):
     if not es_admin(request):

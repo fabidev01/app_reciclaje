@@ -10,24 +10,12 @@
 <body class="dashboard-body">
   <header class="dashboard-header">
     <h1>Bienvenido, Admin</h1>
-    <nav class="dashboard-navigation-menu">
-      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
-      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
-      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
-      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
-      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
-      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
-      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
-      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
-        <option value="#">Bitácoras ↓</option>
-        <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
-        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
-        <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
-      </select>
-      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
-    </nav>
+    <div class="parent-container">
+      <div class="logout-container">
+        <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
+      </div>
+    </div>
   </header>
-
   <main class="dashboard-main admin-panel-main">
     {% if messages %}
       {% for message in messages %}
@@ -40,37 +28,38 @@
     </div>
     <div class="admin-panel-card-container">
       <section class="admin-panel-card-section admin-panel-card-users">
-        <img src="{% static 'img/users-icon.png' %}" alt="Usuarios" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Usuarios</h2>
         <a href="{% url 'admin_usuarios' %}" class="admin-panel-action-button">Gestionar</a>
       </section>
       <section class="admin-panel-card-section admin-panel-card-records">
-        <img src="{% static 'img/records-icon.png' %}" alt="Registros" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Registros</h2>
         <a href="{% url 'admin_registros' %}" class="admin-panel-action-button">Ver</a>
       </section>
       <section class="admin-panel-card-section admin-panel-card-catalog">
-        <img src="{% static 'img/catalog-icon.png' %}" alt="Catálogo" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Catálogo</h2>
         <a href="{% url 'admin_catalogo' %}" class="admin-panel-action-button">Ver</a>
       </section>
       <section class="admin-panel-card-section admin-panel-card-donations">
-        <img src="{% static 'img/donations-icon.png' %}" alt="Donaciones" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Donaciones</h2>
         <a href="{% url 'admin_donacion' %}" class="admin-panel-action-button">Ver</a>
       </section>
       <section class="admin-panel-card-section admin-panel-card-recycling-points">
-        <img src="{% static 'img/recycling-points-icon.png' %}" alt="Puntos de Reciclaje" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Puntos de Reciclaje</h2>
         <a href="{% url 'admin_puntos' %}" class="admin-panel-action-button">Ver</a>
       </section>
       <section class="admin-panel-card-section admin-panel-card-history">
-        <img src="{% static 'img/history-icon.png' %}" alt="Historial" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Historial de Acceso</h2>
         <a href="{% url 'admin_historial' %}" class="admin-panel-action-button">Ver</a>
       </section>
+      <section class="admin-panel-card-section admin-panel-card-roles">
+        <h2 class="admin-panel-card-title">Roles</h2>
+        <a href="{% url 'admin_rol' %}" class="admin-panel-action-button">Ver</a>
+      </section>
+      <section class="admin-panel-card-section admin-panel-card-materials">
+        <h2 class="admin-panel-card-title">Materiales</h2>
+        <a href="{% url 'admin_material' %}" class="admin-panel-action-button">Ver</a>
+      </section>
       <section class="admin-panel-card-section admin-panel-card-log">
-        <img src="{% static 'img/log-icon.png' %}" alt="Bitácora" class="admin-panel-card-image">
         <h2 class="admin-panel-card-title">Bitácora</h2>
         <select name="lista-bitacora" id="lista-bitacora" onchange="redirigirBitacora(this.value)" class="admin-panel-bitacora-select">
           <option value="">Seleccionar</option>
@@ -79,6 +68,43 @@
           <option value="{% url 'bitacora_canje' %}">Canje</option>
         </select>
       </section>
+    </div>
+    <div class="stats-container">
+      <h3>Estadísticas Generales</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Categoría</th>
+            <th>Cantidad</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Usuarios</td>
+            <td>{{ stats.usuarios }}</td>
+          </tr>
+          <tr>
+            <td>Materiales Reciclables</td>
+            <td>{{ stats.materiales }}</td>
+          </tr>
+          <tr>
+            <td>Puntos de Reciclaje</td>
+            <td>{{ stats.puntos }}</td>
+          </tr>
+          <tr>
+            <td>Registros de Reciclaje</td>
+            <td>{{ stats.registros }}</td>
+          </tr>
+          <tr>
+            <td>Recompensas en Catálogo</td>
+            <td>{{ stats.catalogo }}</td>
+          </tr>
+          <tr>
+            <td>Donaciones</td>
+            <td>{{ stats.donaciones }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </main>
 

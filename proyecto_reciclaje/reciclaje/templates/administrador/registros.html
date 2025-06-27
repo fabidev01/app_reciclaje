@@ -6,25 +6,68 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Registros de Reciclaje</title>
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+  <style>
+    .full-screen-table {
+      height: 70vh; /* Ocupa el 70% de la altura de la ventana */
+      overflow-y: auto; /* Scroll vertical si excede */
+      margin-bottom: 20px;
+      display: block; /* Asegura que el scroll funcione */
+    }
+    .filter-right {
+      text-align: right;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .filter-center {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .filter-form {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-form div {
+      display: flex;
+      gap: 5px;
+      align-items: center;
+    }
+    .filter-form input, .filter-form select {
+      padding: 5px;
+    }
+    .filter-form button, .order-button {
+      padding: 5px 10px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    .order-button {
+      margin-left: auto; /* Empuja el botón de ordenar a la derecha */
+    }
+  </style>
 </head>
 <body class="dashboard-body">
-  <header class="dashboard-header">
+<header class="dashboard-header">
     <h1>Bienvenido, Admin</h1>
-    <nav>
-      <a href="{% url 'admin_panel' %}">Inicio</a>
-      <a href="{% url 'admin_usuarios' %}">Ver Usuarios</a>
-      <a href="{% url 'admin_registros' %}">Ver Registros</a>
-      <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
-      <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
+    <nav class="dashboard-navigation-menu">
+      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_rol' %}" class="dashboard-navigation-link">Ver Roles</a>
+      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_material' %}" class="dashboard-navigation-link">Ver Materiales</a>
       <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
-      <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
-      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
+      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
         <option value="#">Bitácoras ↓</option>
         <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
         <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
         <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
       </select>
-      <a href="{% url 'logout' %}">Cerrar Sesión</a>
+      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
     </nav>
   </header>
 
@@ -35,40 +78,232 @@
         <div class="error-message {{ message.tags }}">{{ message }}</div>
       {% endfor %}
     {% endif %}
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Nombre de Usuario</th>
-          <th>Correo</th>
-          <th>Nombre de Punto</th>
-          <th>Cantidad (kg)</th>
-          <th>Puntos</th>
-          <th>CO2 Reducido</th>
-          <th>Fecha Registro</th>
-          <th>Nombre de Material</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for registro in registros %}
+
+    <div class="filter-right">
+      <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+        <div>
+          <label>Usuario:</label>
+          <input type="text" name="reg_user_filter" value="{{ reg_user_filter }}" placeholder="Filtrar por ID, correo o nombre">
+        </div>
+        <div>
+          <label>Material:</label>
+          <input type="text" name="reg_material_filter" value="{{ reg_material_filter }}" placeholder="Filtrar por ID o nombre">
+        </div>
+        <div>
+          <label>Punto:</label>
+          <input type="text" name="reg_point_filter" value="{{ reg_point_filter }}" placeholder="Filtrar por ID o nombre">
+        </div>
+        <div>
+          <label>Día:</label>
+          <input type="number" name="reg_day_filter" value="{{ reg_day_filter }}" min="1" max="31" placeholder="1-31">
+        </div>
+        <div>
+          <label>Mes:</label>
+          <input type="number" name="reg_month_filter" value="{{ reg_month_filter }}" min="1" max="12" placeholder="1-12">
+        </div>
+        <div>
+          <label>Año:</label>
+          <input type="number" name="reg_year_filter" value="{{ reg_year_filter }}" min="2000" max="2100" placeholder="Año">
+        </div>
+        <button type="submit">Filtrar</button>
+      </form>
+      <form method="get" action="{% url 'admin_registros' %}" style="margin-left: 20px;">
+        <select name="order_by" onchange="this.form.submit()">
+          <option value="" {% if not order_by %}selected{% endif %}>Ordenar por</option>
+          <option value="kg" {% if order_by == 'kg' %}selected{% endif %}>Cantidad (kg) ↓</option>
+          <option value="puntos" {% if order_by == 'puntos' %}selected{% endif %}>Puntos ↓</option>
+          <option value="co2" {% if order_by == 'co2' %}selected{% endif %}>CO2 Reducido ↓</option>
+          <option value="fecha" {% if order_by == 'fecha' %}selected{% endif %}>Fecha (Reciente) ↓</option>
+        </select>
+        <input type="hidden" name="reg_user_filter" value="{{ reg_user_filter }}">
+        <input type="hidden" name="reg_material_filter" value="{{ reg_material_filter }}">
+        <input type="hidden" name="reg_puntos_filter" value="{{ reg_puntos_filter }}">
+        <input type="hidden" name="reg_day_filter" value="{{ reg_day_filter }}">
+        <input type="hidden" name="reg_month_filter" value="{{ reg_month_filter }}">
+        <input type="hidden" name "reg_year_filter" value="{{ reg_year_filter }}">
+        <input type="hidden" name="reg_point_filter" value="{{ reg_point_filter }}">
+      </form>
+    </div>
+    <div class="full-screen-table">
+      <table>
+        <thead>
           <tr>
-            <td>{{ registro.0 }}</td>
-            <td>{{ registro.1 }}</td>
-            <td>{{ registro.2 }}</td>
-            <td>{{ registro.3 }}</td>
-            <td>{{ registro.4 }}</td>
-            <td>{{ registro.5 }}</td>
-            <td>{{ registro.6 }}</td>
-            <td>{{ registro.7 }}</td>
-            <td>{{ registro.8 }}</td>
+            <th>ID</th>
+            <th>Nombre de Usuario</th>
+            <th>Correo</th>
+            <th>Nombre de Punto</th>
+            <th>Cantidad (kg)</th>
+            <th>Puntos</th>
+            <th>CO2 Reducido</th>
+            <th>Nombre de Material</th>
+            <th>Fecha Registro</th>
           </tr>
-        {% empty %}
+        </thead>
+        <tbody>
+          {% for registro in registros %}
+            <tr>
+              <td>{{ registro.0 }}</td>
+              <td>{{ registro.1 }}</td>
+              <td>{{ registro.2 }}</td>
+              <td>{{ registro.3 }}</td>
+              <td>{{ registro.4|floatformat:3 }}</td>
+              <td>{{ registro.5|floatformat:3 }}</td>
+              <td>{{ registro.6|floatformat:3 }}</td>
+              <td>{{ registro.7 }}</td>
+              <td>{{ registro.8|date:'d/m/Y' }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9">No hay registros de reciclaje.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 class="mt-4">Estadísticas y Reportes</h2>
+    <div class="stats-container">
+      <h3>Totales Generales</h3>
+      <div class="filter-right">
+        <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+          <button type="submit">Actualizar</button>
+        </form>
+      </div>
+      <table>
+        <thead>
           <tr>
-            <td colspan="9">No hay registros de reciclaje.</td>
+            <th>Métrica</th>
+            <th>Valor</th>
           </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Total CO2 Reducido</td>
+            <td>{{ total_co2_all }} kg</td>
+          </tr>
+          <tr>
+            <td>Total Puntos Acumulados</td>
+            <td>{{ total_puntos_all }}</td>
+          </tr>
+          <tr>
+            <td>Total Kg de Materiales</td>
+            <td>{{ total_kg_all }} kg</td>
+          </tr>
+          <tr>
+            <td>Material con Mayor Puntos</td>
+            <td>{{ max_puntos_material.0 }} ({{ max_puntos_material.1|floatformat:3 }} puntos)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Total por Tipo de Material</h3>
+      <div class="filter-right">
+        <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+          <button type="submit">Actualizar</button>
+        </form>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Material</th>
+            <th>Total Kg</th>
+            <th>Total CO2</th>
+            <th>Total Puntos</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for stat in material_stats %}
+            <tr>
+              <td>{{ stat.0 }}</td>
+              <td>{{ stat.1|floatformat:3 }}</td>
+              <td>{{ stat.2|floatformat:3 }}</td>
+              <td>{{ stat.3|floatformat:3 }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <h3>Actividad de Usuario</h3>
+      <div class="filter-center">
+        <form method="get" action="{% url 'admin_registros' %}" class="filter-form" style="justify-content: center;">
+          <input type="text" name="user_filter" value="{{ user_filter }}" placeholder="Filtrar por ID, correo o nombre">
+          <button type="submit">Filtrar</button>
+        </form>
+      </div>
+      {% if user_filter %}
+        <table>
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Material</th>
+              <th>Total Kg</th>
+              <th>Total Puntos</th>
+              <th>Total CO2</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for activity in user_activity %}
+              <tr>
+                <td>{{ activity.0 }}</td>
+                <td>{{ activity.1 }}</td>
+                <td>{{ activity.2|floatformat:3 }}</td>
+                <td>{{ activity.3|floatformat:3 }}</td>
+                <td>{{ activity.4|floatformat:3 }}</td>
+              </tr>
+            {% empty %}
+              <tr>
+                <td colspan="5">No hay actividad para este usuario.</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% endif %}
+    </div>
+
+    <h2 class="mt-4">Reporte Ambiental Diario</h2>
+    <div class="filter-right">
+      <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+        <div>
+          <label>Mes:</label>
+          <input type="number" name="impacto_mes_filter" value="{{ impacto_mes_filter }}" min="1" max="12" placeholder="1-12">
+        </div>
+        <div>
+          <label>Año:</label>
+          <input type="number" name="impacto_anno_filter" value="{{ impacto_anno_filter }}" min="2000" max="2100" placeholder="Año">
+        </div>
+        <button type="submit">Filtrar</button>
+      </form>
+    </div>
+    <div class="stats-container">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Fecha</th>
+            <th>Tipo de Basura</th>
+            <th>Unidad</th>
+            <th>Cantidad Reciclada</th>
+            <th>CO2 Reducido</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for impacto in impacto_ambiental %}
+            <tr>
+              <td>{{ impacto.0 }}</td>
+              <td>{{ impacto.1|date:'d/m/Y' }}</td>
+              <td>{{ impacto.2 }}</td>
+              <td>{{ impacto.3 }}</td>
+              <td>{{ impacto.4|floatformat:3 }}</td>
+              <td>{{ impacto.5|floatformat:3 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">No hay datos de impacto ambiental para el día actual.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </main>
 
   <script>

@@ -15,9 +15,9 @@ Pasos para ajustar la app
   python manage.py makemigrations
 8 en consola o en cmd 
   python manage.py migrate 
-7 obviar las migraciones 
+9 obviar las migraciones 
   python manage.py migrate --fake
-8 hashear las contraseña con el script
+10 hashear las contraseña con el script
   python manage.py hash_passwords
-9 correr el servidor 
+11 correr el servidor 
   python manage.py runserver

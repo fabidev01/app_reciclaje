@@ -6,16 +6,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Puntos de Reciclaje</title>
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
 </head>
+<style>
+  /* Mapa */
+.map-admin-container {
+    position: relative;
+    height: 300px !important; /* Aumentado para asegurar visibilidad */
+    width: 100% !important;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+}
+
+.map-admin-search-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.map-admin-search {
+    width: 100%;
+    padding: 5px;
+    margin-right: 5px;
+}
+
+.map-admin-search-button {
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.map-admin-search-button:hover {
+    background-color: #0056b3;
+}
+
+</style>
 <body class="dashboard-body">
-  <header class="dashboard-header">
+<header class="dashboard-header">
     <h1>Bienvenido, Admin</h1>
     <nav class="dashboard-navigation-menu">
       <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
       <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_rol' %}" class="dashboard-navigation-link">Ver Roles</a>
       <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
       <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
       <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_material' %}" class="dashboard-navigation-link">Ver Materiales</a>
       <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
       <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
@@ -103,12 +142,14 @@
             <input type="time" name="hora_cierre" id="adminPuntosAddHoraCierre" class="admin-puntos-reciclaje-modal-input" required />
           </div>
           <div class="admin-puntos-reciclaje-modal-field">
-            <label for="adminPuntosAddLatitud" class="admin-puntos-reciclaje-modal-label">Latitud</label>
-            <input type="number" step="0.0001" name="latitud" id="adminPuntosAddLatitud" class="admin-puntos-reciclaje-modal-input" required />
-          </div>
-          <div class="admin-puntos-reciclaje-modal-field">
-            <label for="adminPuntosAddLongitud" class="admin-puntos-reciclaje-modal-label">Longitud</label>
-            <input type="number" step="0.0001" name="longitud" id="adminPuntosAddLongitud" class="admin-puntos-reciclaje-modal-input" required />
+            <label class="admin-puntos-reciclaje-modal-label">Ubicación</label>
+            <div class="map-admin-search-container">
+              <input type="text" id="adminPuntosAddSearch" class="map-admin-search" placeholder="Cochabamba, avenida sucre" />
+              <button type="button" class="map-admin-search-button" onclick="searchLocationAdd()"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="map-admin-container" id="mapAdminAdd"></div>
+            <input type="number" step="0.0001" name="latitud" id="adminPuntosAddLatitud" class="admin-puntos-reciclaje-modal-input" readonly required />
+            <input type="number" step="0.0001" name="longitud" id="adminPuntosAddLongitud" class="admin-puntos-reciclaje-modal-input" readonly required />
           </div>
           <div class="admin-puntos-reciclaje-modal-field">
             <label for="adminPuntosAddEstado" class="admin-puntos-reciclaje-modal-label">Estado</label>
@@ -162,12 +203,14 @@
             <input type="time" name="hora_cierre" id="adminPuntosEditHoraCierre" class="admin-puntos-reciclaje-modal-input" required />
           </div>
           <div class="admin-puntos-reciclaje-modal-field">
-            <label for="adminPuntosEditLatitud" class="admin-puntos-reciclaje-modal-label">Latitud</label>
-            <input type="number" step="0.0001" name="latitud" id="adminPuntosEditLatitud" class="admin-puntos-reciclaje-modal-input" required />
-          </div>
-          <div class="admin-puntos-reciclaje-modal-field">
-            <label for="adminPuntosEditLongitud" class="admin-puntos-reciclaje-modal-label">Longitud</label>
-            <input type="number" step="0.0001" name="longitud" id="adminPuntosEditLongitud" class="admin-puntos-reciclaje-modal-input" required />
+            <label class="admin-puntos-reciclaje-modal-label">Ubicación</label>
+            <div class="map-admin-search-container">
+              <input type="text" id="adminPuntosEditSearch" class="map-admin-search" placeholder="Cochabamba, avenida sucre" />
+              <button type="button" class="map-admin-search-button" onclick="searchLocationEdit()"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="map-admin-container" id="mapAdminEdit"></div>
+            <input type="number" step="0.0001" name="latitud" id="adminPuntosEditLatitud" class="admin-puntos-reciclaje-modal-input" readonly required />
+            <input type="number" step="0.0001" name="longitud" id="adminPuntosEditLongitud" class="admin-puntos-reciclaje-modal-input" readonly required />
           </div>
           <div class="admin-puntos-reciclaje-modal-field">
             <label for="adminPuntosEditEstado" class="admin-puntos-reciclaje-modal-label">Estado</label>
@@ -195,53 +238,12 @@
       </div>
     </div>
 
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
+  <script src="{% static 'js/mapaAdmin.js' %}"></script>
   <script>
     function redirigirBitacora(url) {
       if (url) window.location.href = url;
-    }
-
-    function openAddModal() {
-      document.getElementById('adminPuntosAddNombre').value = '';
-      document.getElementById('adminPuntosAddCapacidad').value = '0';
-      document.getElementById('adminPuntosAddHoraApertura').value = '08:00';
-      document.getElementById('adminPuntosAddHoraCierre').value = '18:00';
-      document.getElementById('adminPuntosAddLatitud').value = '-17.3833';
-      document.getElementById('adminPuntosAddLongitud').value = '-66.1568';
-      document.getElementById('adminPuntosAddEstado').value = 'Disponible';
-      document.querySelectorAll('#adminPuntosAddModal input[name="materiales"]').forEach(checkbox => checkbox.checked = false);
-      document.querySelectorAll('#adminPuntosAddModal input[name="condiciones"]').forEach(input => input.value = '');
-      document.getElementById('adminPuntosAddModal').classList.add('active');
-    }
-
-    function closeAddModal() {
-      document.getElementById('adminPuntosAddModal').classList.remove('active');
-    }
-
-    function openEditModal(id, nombre, capacidad, hora_apertura, hora_cierre, latitud, longitud, estado, material_conditions) {
-      document.getElementById('adminPuntosEditId').value = id;
-      document.getElementById('adminPuntosEditNombre').value = nombre;
-      document.getElementById('adminPuntosEditCapacidad').value = capacidad;
-      document.getElementById('adminPuntosEditHoraApertura').value = hora_apertura;
-      document.getElementById('adminPuntosEditHoraCierre').value = hora_cierre;
-      document.getElementById('adminPuntosEditLatitud').value = latitud;
-      document.getElementById('adminPuntosEditLongitud').value = longitud;
-      document.getElementById('adminPuntosEditEstado').value = estado;
-      const materialConditionsMap = material_conditions ? material_conditions.split(',').reduce((map, item) => {
-        const [matId, cond] = item.split(':');
-        map[matId] = cond;
-        return map;
-      }, {}) : {};
-      const checkboxes = document.querySelectorAll('#adminPuntosEditModal input[name="materiales"]');
-      const conditionInputs = document.querySelectorAll('#adminPuntosEditModal input[name="condiciones"]');
-      checkboxes.forEach((checkbox, index) => {
-        checkbox.checked = materialConditionsMap[checkbox.value] !== undefined;
-        conditionInputs[index].value = materialConditionsMap[checkbox.value] || '';
-      });
-      document.getElementById('adminPuntosEditModal').classList.add('active');
-    }
-
-    function closeEditModal() {
-      document.getElementById('adminPuntosEditModal').classList.remove('active');
     }
 
     function confirmDelete(id) {

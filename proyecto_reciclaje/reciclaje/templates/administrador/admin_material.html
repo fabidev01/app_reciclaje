@@ -1,0 +1,184 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materiales</title>
+  <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+</head>
+<body class="dashboard-body">
+<header class="dashboard-header">
+    <h1>Bienvenido, Admin</h1>
+    <nav class="dashboard-navigation-menu">
+      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_rol' %}" class="dashboard-navigation-link">Ver Roles</a>
+      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_material' %}" class="dashboard-navigation-link">Ver Materiales</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
+      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
+        <option value="#">Bitácoras ↓</option>
+        <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
+        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
+        <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
+      </select>
+      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
+    </nav>
+  </header>
+  <main class="main-content-admin-material">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="admin-usuarios-message admin-usuarios-message-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <h2>Materiales Reciclables</h2>
+    <div class="admin-usuarios-table-scroll">
+      <table class="admin-usuarios-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Puntos por Unidad</th>
+            <th>CO2 por Unidad</th>
+            <th>Unidad de Medida</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for material in materiales %}
+            <tr>
+              <td>{{ material.0 }}</td>
+              <td>{{ material.1 }}</td>
+              <td>{{ material.2 }}</td>
+              <td>{{ material.3 }}</td>
+              <td>{{ material.4 }}</td>
+              <td>
+                <button class="admin-usuarios-edit-button" onclick="openEditModal('{{ material.0 }}', '{{ material.1 }}', '{{ material.2 }}', '{{ material.3 }}', '{{ material.4 }}')">✏️</button>
+                <button class="delete-btn" onclick="deleteMaterial('{{ material.0 }}')">🗑️</button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6">Sin materiales.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-usuarios-add-user-container">
+      <button class="admin-usuarios-add-user-button-green" onclick="openAddModal()">Añadir Nuevo Material</button>
+    </div>
+
+    <!-- Modal para añadir material -->
+    <div id="adminMaterialAddModal" class="admin-usuarios-modal">
+      <div class="admin-usuarios-modal-content">
+        <span class="admin-usuarios-close-btn" onclick="closeAddModal()">×</span>
+        <h2>Añadir Nuevo Material</h2>
+        <form id="adminMaterialAddForm" method="post" action="{% url 'admin_material' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add">
+          <label for="adminMaterialAddNombre">Nombre:</label>
+          <input type="text" name="nombre" id="adminMaterialAddNombre" required>
+          <label for="adminMaterialAddPuntos">Puntos por Unidad:</label>
+          <input type="number" name="puntos_por_unidad" id="adminMaterialAddPuntos" min="0" required>
+          <label for="adminMaterialAddCO2">CO2 por Unidad:</label>
+          <input type="number" step="0.01" name="co2_por_unidad" id="adminMaterialAddCO2" min="0" required>
+          <label for="adminMaterialAddUnidad">Unidad de Medida:</label>
+          <input type="text" name="unidad_medida" id="adminMaterialAddUnidad" required>
+          <button type="submit" class="admin-usuarios-save-btn">Guardar Nuevo Material</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para edición de material -->
+    <div id="adminMaterialEditModal" class="admin-usuarios-modal">
+      <div class="admin-usuarios-modal-content">
+        <span class="admin-usuarios-close-btn" onclick="closeEditModal()">×</span>
+        <h2>Editar Material</h2>
+        <form id="adminMaterialEditForm" method="post" action="{% url 'admin_material' %}">
+          {% csrf_token %}
+          <input type="hidden" name="id_material" id="adminMaterialEditId">
+          <input type="hidden" name="action" value="update">
+          <label for="adminMaterialEditNombre">Nombre:</label>
+          <input type="text" name="nombre" id="adminMaterialEditNombre" required>
+          <label for="adminMaterialEditPuntos">Puntos por Unidad:</label>
+          <input type="number" name="puntos_por_unidad" id="adminMaterialEditPuntos" min="0" required>
+          <label for="adminMaterialEditCO2">CO2 por Unidad:</label>
+          <input type="number" step="0.01" name="co2_por_unidad" id="adminMaterialEditCO2" min="0" required>
+          <label for="adminMaterialEditUnidad">Unidad de Medida:</label>
+          <input type="text" name="unidad_medida" id="adminMaterialEditUnidad" required>
+          <button type="submit" class="admin-usuarios-save-btn">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      function redirigirBitacora(url) {
+        if (url) {
+          window.location.href = url;
+        }
+      }
+
+      function openEditModal(id, nombre, puntos, co2, unidad) {
+        document.getElementById('adminMaterialEditId').value = id;
+        document.getElementById('adminMaterialEditNombre').value = nombre;
+        document.getElementById('adminMaterialEditPuntos').value = puntos;
+        document.getElementById('adminMaterialEditCO2').value = co2;
+        document.getElementById('adminMaterialEditUnidad').value = unidad;
+        document.getElementById('adminMaterialEditModal').classList.add('active');
+      }
+
+      function closeEditModal() {
+        document.getElementById('adminMaterialEditModal').classList.remove('active');
+      }
+
+      function openAddModal() {
+        document.getElementById('adminMaterialAddNombre').value = '';
+        document.getElementById('adminMaterialAddPuntos').value = '';
+        document.getElementById('adminMaterialAddCO2').value = '';
+        document.getElementById('adminMaterialAddUnidad').value = '';
+        document.getElementById('adminMaterialAddModal').classList.add('active');
+      }
+
+      function closeAddModal() {
+        document.getElementById('adminMaterialAddModal').classList.remove('active');
+      }
+
+      function deleteMaterial(id) {
+        if (confirm('¿Estás seguro de que quieres eliminar este material? Esto también eliminará sus relaciones con puntos de reciclaje.')) {
+          const form = document.createElement('form');
+          form.method = 'post';
+          form.action = '{% url "admin_material" %}';
+          const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').cloneNode();
+          const actionInput = document.createElement('input');
+          actionInput.type = 'hidden';
+          actionInput.name = 'action';
+          actionInput.value = 'delete';
+          const idInput = document.createElement('input');
+          idInput.type = 'hidden';
+          idInput.name = 'id_material';
+          idInput.value = id;
+          form.appendChild(csrfToken);
+          form.appendChild(actionInput);
+          form.appendChild(idInput);
+          document.body.appendChild(form);
+          form.submit();
+        }
+      }
+
+      window.onclick = function(event) {
+        const editModal = document.getElementById('adminMaterialEditModal');
+        const addModal = document.getElementById('adminMaterialAddModal');
+        if (event.target == editModal) {
+          editModal.classList.remove('active');
+        }
+        if (event.target == addModal) {
+          addModal.classList.remove('active');
+        }
+      };
+    </script>
+  </main>
+</body>
+</html>

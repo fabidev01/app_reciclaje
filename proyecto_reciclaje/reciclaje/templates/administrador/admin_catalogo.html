@@ -8,23 +8,25 @@
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
 </head>
 <body class="dashboard-body">
-  <header class="dashboard-header">
+<header class="dashboard-header">
     <h1>Bienvenido, Admin</h1>
-    <nav>
-      <a href="{% url 'admin_panel' %}">Inicio</a>
-      <a href="{% url 'admin_usuarios' %}">Ver Usuarios</a>
-      <a href="{% url 'admin_registros' %}">Ver Registros</a>
-      <a href="{% url 'admin_catalogo' %}">Ver Catálogos</a>
-      <a href="{% url 'admin_donacion' %}">Ver Donaciones</a>
+    <nav class="dashboard-navigation-menu">
+      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_rol' %}" class="dashboard-navigation-link">Ver Roles</a>
+      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_material' %}" class="dashboard-navigation-link">Ver Materiales</a>
       <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
-      <a href="{% url 'admin_historial' %}">Historial de Acceso</a>
-      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)">
+      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
         <option value="#">Bitácoras ↓</option>
         <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
         <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
         <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
       </select>
-      <a href="{% url 'logout' %}">Cerrar Sesión</a>
+      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
     </nav>
   </header>
  <main class="admin-catalogo-main">

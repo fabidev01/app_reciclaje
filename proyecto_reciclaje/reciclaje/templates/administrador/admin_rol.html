@@ -1,0 +1,205 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Roles de Usuario</title>
+  <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+</head>
+<body class="dashboard-body">
+<header class="dashboard-header">
+    <h1>Bienvenido, Admin</h1>
+    <nav class="dashboard-navigation-menu">
+      <a href="{% url 'admin_panel' %}" class="dashboard-navigation-link">Inicio</a>
+      <a href="{% url 'admin_usuarios' %}" class="dashboard-navigation-link">Ver Usuarios</a>
+      <a href="{% url 'admin_rol' %}" class="dashboard-navigation-link">Ver Roles</a>
+      <a href="{% url 'admin_registros' %}" class="dashboard-navigation-link">Ver Registros</a>
+      <a href="{% url 'admin_catalogo' %}" class="dashboard-navigation-link">Ver Catálogos</a>
+      <a href="{% url 'admin_donacion' %}" class="dashboard-navigation-link">Ver Donaciones</a>
+      <a href="{% url 'admin_material' %}" class="dashboard-navigation-link">Ver Materiales</a>
+      <a href="{% url 'admin_puntos' %}" class="dashboard-navigation-link">Ver Puntos de Reciclaje</a>
+      <a href="{% url 'admin_historial' %}" class="dashboard-navigation-link">Historial de Acceso</a>
+      <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
+        <option value="#">Bitácoras ↓</option>
+        <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
+        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
+        <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
+      </select>
+      <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
+    </nav>
+  </header>
+  <main class="admin-usuarios-main">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="admin-usuarios-message admin-usuarios-message-{{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+    <h2>Roles de Usuario</h2>
+    <div class="admin-usuarios-table-scroll">
+      <table class="admin-usuarios-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre del Rol</th>
+            <th>Descripción</th>
+            <th>Permisos</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rol in roles %}
+            <tr>
+              <td>{{ rol.0 }}</td>
+              <td>{{ rol.1 }}</td>
+              <td>{{ rol.2|default:'Sin descripción' }}</td>
+              <td>{{ rol.3|default:'Sin permisos' }}</td>
+              <td>
+                <button class="admin-usuarios-edit-button" onclick="openEditModal('{{ rol.0 }}', '{{ rol.1 }}', '{{ rol.2|default:'' }}', '{{ rol.3|default:''|escapejs }}')">✏️</button>
+                <button class="delete-btn" onclick="deleteRol('{{ rol.0 }}')">🗑️</button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="5">Sin roles.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-usuarios-add-user-container">
+      <button class="admin-usuarios-add-user-button-green" onclick="openAddModal()">Añadir Nuevo Rol</button>
+    </div>
+
+    <!-- Tabla para gestionar permisos -->
+    <h2>Gestión de Permisos</h2>
+    <div class="admin-usuarios-table-scroll">
+      <table class="admin-usuarios-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre del Permiso</th>
+            <th>Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for permiso in permisos_disponibles %}
+            <tr>
+              <td>{{ permiso.0 }}</td>
+              <td>{{ permiso.1 }}</td>
+              <td>
+                <button class="admin-usuarios-edit-button" onclick="openEditPermisoModal('{{ permiso.0 }}', '{{ permiso.1 }}')">✏️</button>
+                <button class="delete-btn" onclick="deletePermiso('{{ permiso.0 }}')">🗑️</button>
+              </td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">Sin permisos.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="admin-usuarios-add-user-container">
+      <button class="admin-usuarios-add-user-button-green" onclick="openAddPermisoModal()">Añadir Nuevo Permiso</button>
+    </div>
+
+    <!-- Modal para añadir rol -->
+    <div id="adminRolesAddModal" class="admin-usuarios-modal">
+      <div class="admin-usuarios-modal-content">
+        <span class="admin-usuarios-close-btn" onclick="closeAddModal()">×</span>
+        <h2>Añadir Nuevo Rol</h2>
+        <form id="adminRolesAddForm" method="post" action="{% url 'admin_rol' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add">
+          <label for="adminRolesAddNombre">Nombre del Rol:</label>
+          <input type="text" name="nombre" id="adminRolesAddNombre" required>
+          <label for="adminRolesAddDescripcion">Descripción:</label>
+          <input type="text" name="descripcion" id="adminRolesAddDescripcion" required>
+          <label>Añadir Permiso:</label>
+          <select id="adminRolesAddPermisoAdd" name="adminRolesAddPermiso">
+            <option value="">Selecciona un permiso...</option>
+            {% for permiso in permisos_disponibles %}
+              <option value="{{ permiso.0 }}">{{ permiso.1 }}</option>
+            {% endfor %}
+          </select>
+          <button type="button" class="admin-usuarios-add-permiso-btn" onclick="addPermiso('add')">Añadir</button>
+          <div id="adminRolesAddPermisosList" class="admin-usuarios-permisos-list"></div>
+          <input type="hidden" name="permisos" id="adminRolesAddPermisosHidden">
+          <button type="submit" class="admin-usuarios-save-btn">Guardar Nuevo Rol</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para edición de rol -->
+    <div id="adminRolesEditModal" class="admin-usuarios-modal">
+      <div class="admin-usuarios-modal-content">
+        <span class="admin-usuarios-close-btn" onclick="closeEditModal()">×</span>
+        <h2>Editar Rol y Permisos</h2>
+        <form id="adminRolesEditForm" method="post" action="{% url 'admin_rol' %}">
+          {% csrf_token %}
+          <input type="hidden" name="id_rol" id="adminRolesEditId">
+          <input type="hidden" name="action" value="update">
+          
+          <label for="adminRolesEditNombre">Nombre del Rol:</label>
+          <input type="text" name="nombre" id="adminRolesEditNombre" required>
+
+          <label for="adminRolesEditDescripcion">Descripción:</label>
+          <input type="text" name="descripcion" id="adminRolesEditDescripcion" required>
+
+          <label>Añadir Permiso:</label>
+          <select id="adminRolesAddPermisoEdit" name="adminRolesAddPermiso">
+            <option value="">Selecciona un permiso...</option>
+            {% for permiso in permisos_disponibles %}
+              <option value="{{ permiso.0 }}">{{ permiso.1 }}</option>
+            {% endfor %}
+          </select>
+          <button type="button" class="admin-usuarios-add-permiso-btn" onclick="addPermiso('edit')">Añadir</button>
+
+          <div id="adminRolesPermisosList" class="admin-usuarios-permisos-list"></div>
+          <input type="hidden" name="permisos" id="adminRolesPermisosHidden">
+
+          <button type="submit" class="admin-usuarios-save-btn">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para añadir permiso -->
+    <div id="adminPermisosAddModal" class="admin-usuarios-modal">
+      <div class="admin-usuarios-modal-content">
+        <span class="admin-usuarios-close-btn" onclick="closeAddPermisoModal()">×</span>
+        <h2>Añadir Nuevo Permiso</h2>
+        <form id="adminPermisosAddForm" method="post" action="{% url 'admin_rol' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="add_permiso">
+          <label for="adminPermisosAddNombre">Nombre del Permiso:</label>
+          <input type="text" name="nombre_permiso" id="adminPermisosAddNombre" required>
+          <button type="submit" class="admin-usuarios-save-btn">Guardar Nuevo Permiso</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal para editar permiso -->
+    <div id="adminPermisosEditModal" class="admin-usuarios-modal">
+      <div class="admin-usuarios-modal-content">
+        <span class="admin-usuarios-close-btn" onclick="closeEditPermisoModal()">×</span>
+        <h2>Editar Permiso</h2>
+        <form id="adminPermisosEditForm" method="post" action="{% url 'admin_rol' %}">
+          {% csrf_token %}
+          <input type="hidden" name="id_permiso" id="adminPermisosEditId">
+          <input type="hidden" name="action" value="update_permiso">
+          <label for="adminPermisosEditNombre">Nombre del Permiso:</label>
+          <input type="text" name="nombre_permiso" id="adminPermisosEditNombre" required>
+          <button type="submit" class="admin-usuarios-save-btn">Guardar Cambios</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="{% static 'js/admin_rol.js' %}"></script>
+  <script>
+    var permisos_disponibles_dict = {
+      {% for permiso in permisos_disponibles %}
+        "{{ permiso.0 }}": "{{ permiso.1 }}",
+      {% endfor %}
+    };
+  </script>
+</body>
+</html>
