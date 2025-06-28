@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
   <style>
     .full-screen-table {
-      height: 70vh; /* Ocupa el 70% de la altura de la ventana */
-      overflow-y: auto; /* Scroll vertical si excede */
+      height: 70vh;
+      overflow-y: auto;
       margin-bottom: 20px;
-      display: block; /* Asegura que el scroll funcione */
+      display: block;
     }
     .filter-right {
       text-align: right;
@@ -44,7 +44,34 @@
       border-radius: 5px;
     }
     .order-button {
-      margin-left: auto; /* Empuja el botón de ordenar a la derecha */
+      margin-left: auto;
+    }
+    .grouping-select {
+      padding: 5px;
+      margin-top: 10px;
+    }
+    .grouped-table {
+      margin-top: 20px;
+    }
+    .user-filter-form {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .user-activity-table {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background: linear-gradient(135deg, #2c3e50, #34495e); /* Mismo gradiente que el nav */
+      color: white;
     }
   </style>
 </head>
@@ -69,198 +96,271 @@
       </select>
       <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
     </nav>
-  </header>
+</header>
 
-  <main class="tabla-usuarios">
-    <h2>Registros</h2>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="error-message {{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+<main class="tabla-usuarios">
+  <h2>Registros</h2>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="error-message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
 
-    <div class="filter-right">
-      <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
-        <div>
-          <label>Usuario:</label>
-          <input type="text" name="reg_user_filter" value="{{ reg_user_filter }}" placeholder="Filtrar por ID, correo o nombre">
-        </div>
-        <div>
-          <label>Material:</label>
-          <input type="text" name="reg_material_filter" value="{{ reg_material_filter }}" placeholder="Filtrar por ID o nombre">
-        </div>
-        <div>
-          <label>Punto:</label>
-          <input type="text" name="reg_point_filter" value="{{ reg_point_filter }}" placeholder="Filtrar por ID o nombre">
-        </div>
-        <div>
-          <label>Día:</label>
-          <input type="number" name="reg_day_filter" value="{{ reg_day_filter }}" min="1" max="31" placeholder="1-31">
-        </div>
-        <div>
-          <label>Mes:</label>
-          <input type="number" name="reg_month_filter" value="{{ reg_month_filter }}" min="1" max="12" placeholder="1-12">
-        </div>
-        <div>
-          <label>Año:</label>
-          <input type="number" name="reg_year_filter" value="{{ reg_year_filter }}" min="2000" max="2100" placeholder="Año">
-        </div>
-        <button type="submit">Filtrar</button>
-      </form>
-      <form method="get" action="{% url 'admin_registros' %}" style="margin-left: 20px;">
-        <select name="order_by" onchange="this.form.submit()">
-          <option value="" {% if not order_by %}selected{% endif %}>Ordenar por</option>
-          <option value="kg" {% if order_by == 'kg' %}selected{% endif %}>Cantidad (kg) ↓</option>
-          <option value="puntos" {% if order_by == 'puntos' %}selected{% endif %}>Puntos ↓</option>
-          <option value="co2" {% if order_by == 'co2' %}selected{% endif %}>CO2 Reducido ↓</option>
-          <option value="fecha" {% if order_by == 'fecha' %}selected{% endif %}>Fecha (Reciente) ↓</option>
-        </select>
-        <input type="hidden" name="reg_user_filter" value="{{ reg_user_filter }}">
-        <input type="hidden" name="reg_material_filter" value="{{ reg_material_filter }}">
-        <input type="hidden" name="reg_puntos_filter" value="{{ reg_puntos_filter }}">
-        <input type="hidden" name="reg_day_filter" value="{{ reg_day_filter }}">
-        <input type="hidden" name="reg_month_filter" value="{{ reg_month_filter }}">
-        <input type="hidden" name "reg_year_filter" value="{{ reg_year_filter }}">
-        <input type="hidden" name="reg_point_filter" value="{{ reg_point_filter }}">
-      </form>
-    </div>
-    <div class="full-screen-table">
-      <table>
+  <div class="filter-right">
+    <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+      <div>
+        <label>Usuario:</label>
+        <input type="text" name="reg_user_filter" value="{{ reg_user_filter }}" placeholder="Filtrar por ID, correo o nombre">
+      </div>
+      <div>
+        <label>Material:</label>
+        <input type="text" name="reg_material_filter" value="{{ reg_material_filter }}" placeholder="Filtrar por ID o nombre">
+      </div>
+      <div>
+        <label>Punto:</label>
+        <input type="text" name="reg_point_filter" value="{{ reg_point_filter }}" placeholder="Filtrar por ID o nombre">
+      </div>
+      <div>
+        <label>Día:</label>
+        <input type="number" name="reg_day_filter" value="{{ reg_day_filter }}" min="1" max="31" placeholder="1-31">
+      </div>
+      <div>
+        <label>Mes:</label>
+        <input type="number" name="reg_month_filter" value="{{ reg_month_filter }}" min="1" max="12" placeholder="1-12">
+      </div>
+      <div>
+        <label>Año:</label>
+        <input type="number" name="reg_year_filter" value="{{ reg_year_filter }}" min="2000" max="2100" placeholder="Año">
+      </div>
+      <button type="submit">Filtrar</button>
+    </form>
+    <form method="get" action="{% url 'admin_registros' %}" style="margin-left: 20px;">
+      <select name="order_by" onchange="this.form.submit()">
+        <option value="" {% if not order_by %}selected{% endif %}>Ordenar por</option>
+        <option value="kg" {% if order_by == 'kg' %}selected{% endif %}>Cantidad (kg) ↓</option>
+        <option value="puntos" {% if order_by == 'puntos' %}selected{% endif %}>Puntos ↓</option>
+        <option value="co2" {% if order_by == 'co2' %}selected{% endif %}>CO2 Reducido ↓</option>
+        <option value="fecha" {% if order_by == 'fecha' %}selected{% endif %}>Fecha (Reciente) ↓</option>
+      </select>
+      <input type="hidden" name="reg_user_filter" value="{{ reg_user_filter }}">
+      <input type="hidden" name="reg_material_filter" value="{{ reg_material_filter }}">
+      <input type="hidden" name="reg_point_filter" value="{{ reg_point_filter }}">
+      <input type="hidden" name="reg_day_filter" value="{{ reg_day_filter }}">
+      <input type="hidden" name="reg_month_filter" value="{{ reg_month_filter }}">
+      <input type="hidden" name="reg_year_filter" value="{{ reg_year_filter }}">
+    </form>
+  </div>
+  <div class="full-screen-table">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre de Usuario</th>
+          <th>Correo</th>
+          <th>Material</th>
+          <th>Punto</th>
+          <th>Puntos</th>
+          <th>Kg</th>
+          <th>CO2 Reducido</th>
+          <th>Fecha Registro</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for registro in registros %}
+          <tr>
+            <td>{{ registro.0 }}</td>
+            <td>{{ registro.1 }}</td>
+            <td>{{ registro.2 }}</td>
+            <td>{{ registro.3 }}</td>
+            <td>{{ registro.4 }}</td>
+            <td>{{ registro.5|floatformat:3 }}</td>
+            <td>{{ registro.6|floatformat:3 }}</td>
+            <td>{{ registro.7|floatformat:3 }}</td>
+            <td>{{ registro.8|date:'d/m/Y' }}</td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="9">No hay registros de reciclaje.</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="filter-center">
+    <form method="get" action="{% url 'admin_registros' %}" class="filter-form" style="justify-content: center;">
+      <select name="group_by" class="grouping-select" onchange="this.form.submit()">
+        <option value="" {% if not group_by %}selected{% endif %}>Agrupar por</option>
+        <option value="usuario_material" {% if group_by == 'usuario_material' %}selected{% endif %}>Usuario con Material</option>
+        <option value="usuario_punto" {% if group_by == 'usuario_punto' %}selected{% endif %}>Usuario con Punto</option>
+      </select>
+      <input type="hidden" name="reg_user_filter" value="{{ reg_user_filter }}">
+      <input type="hidden" name="reg_material_filter" value="{{ reg_material_filter }}">
+      <input type="hidden" name="reg_point_filter" value="{{ reg_point_filter }}">
+      <input type="hidden" name="reg_day_filter" value="{{ reg_day_filter }}">
+      <input type="hidden" name="reg_month_filter" value="{{ reg_month_filter }}">
+      <input type="hidden" name="reg_year_filter" value="{{ reg_year_filter }}">
+      <input type="hidden" name="order_by" value="{{ order_by }}">
+    </form>
+  </div>
+
+  {% if group_by or user_filter %}
+    <div class="grouped-table">
+      <h3>Actividad Agrupada</h3>
+      <table class="full-screen-table">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Nombre de Usuario</th>
-            <th>Correo</th>
-            <th>Nombre de Punto</th>
-            <th>Cantidad (kg)</th>
-            <th>Puntos</th>
-            <th>CO2 Reducido</th>
-            <th>Nombre de Material</th>
-            <th>Fecha Registro</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for registro in registros %}
-            <tr>
-              <td>{{ registro.0 }}</td>
-              <td>{{ registro.1 }}</td>
-              <td>{{ registro.2 }}</td>
-              <td>{{ registro.3 }}</td>
-              <td>{{ registro.4|floatformat:3 }}</td>
-              <td>{{ registro.5|floatformat:3 }}</td>
-              <td>{{ registro.6|floatformat:3 }}</td>
-              <td>{{ registro.7 }}</td>
-              <td>{{ registro.8|date:'d/m/Y' }}</td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="9">No hay registros de reciclaje.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <h2 class="mt-4">Estadísticas y Reportes</h2>
-    <div class="stats-container">
-      <h3>Totales Generales</h3>
-      <div class="filter-right">
-        <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
-          <button type="submit">Actualizar</button>
-        </form>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Métrica</th>
-            <th>Valor</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Total CO2 Reducido</td>
-            <td>{{ total_co2_all }} kg</td>
-          </tr>
-          <tr>
-            <td>Total Puntos Acumulados</td>
-            <td>{{ total_puntos_all }}</td>
-          </tr>
-          <tr>
-            <td>Total Kg de Materiales</td>
-            <td>{{ total_kg_all }} kg</td>
-          </tr>
-          <tr>
-            <td>Material con Mayor Puntos</td>
-            <td>{{ max_puntos_material.0 }} ({{ max_puntos_material.1|floatformat:3 }} puntos)</td>
-          </tr>
-        </tbody>
-      </table>
-
-      <h3>Total por Tipo de Material</h3>
-      <div class="filter-right">
-        <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
-          <button type="submit">Actualizar</button>
-        </form>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Material</th>
-            <th>Total Kg</th>
-            <th>Total CO2</th>
-            <th>Total Puntos</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for stat in material_stats %}
-            <tr>
-              <td>{{ stat.0 }}</td>
-              <td>{{ stat.1|floatformat:3 }}</td>
-              <td>{{ stat.2|floatformat:3 }}</td>
-              <td>{{ stat.3|floatformat:3 }}</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-
-      <h3>Actividad de Usuario</h3>
-      <div class="filter-center">
-        <form method="get" action="{% url 'admin_registros' %}" class="filter-form" style="justify-content: center;">
-          <input type="text" name="user_filter" value="{{ user_filter }}" placeholder="Filtrar por ID, correo o nombre">
-          <button type="submit">Filtrar</button>
-        </form>
-      </div>
-      {% if user_filter %}
-        <table>
-          <thead>
-            <tr>
-              <th>Usuario</th>
+            <th>Usuario</th>
+            {% if group_by == 'usuario_material' or user_filter %}
               <th>Material</th>
               <th>Total Kg</th>
               <th>Total Puntos</th>
               <th>Total CO2</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for activity in user_activity %}
-              <tr>
-                <td>{{ activity.0 }}</td>
-                <td>{{ activity.1 }}</td>
-                <td>{{ activity.2|floatformat:3 }}</td>
+            {% elif group_by == 'usuario_punto' %}
+              <th>Punto</th>
+              <th>Total Kg</th>
+              <th>Total Puntos</th>
+              <th>Total CO2</th>
+            {% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for activity in user_activity %}
+            <tr>
+              <td>{{ activity.0 }}</td>
+              <td>{{ activity.1 }}</td>
+              {% if group_by == 'usuario_material' or user_filter %}
+                <td>{{ activity.2 }}</td>
                 <td>{{ activity.3|floatformat:3 }}</td>
                 <td>{{ activity.4|floatformat:3 }}</td>
-              </tr>
-            {% empty %}
-              <tr>
-                <td colspan="5">No hay actividad para este usuario.</td>
-              </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      {% endif %}
+                <td>{{ activity.5|floatformat:3 }}</td>
+              {% elif group_by == 'usuario_punto' %}
+                <td>{{ activity.3 }}</td> <!-- Punto Nombre -->
+                <td>{{ activity.4|floatformat:3 }}</td>
+                <td>{{ activity.5|floatformat:3 }}</td>
+                <td>{{ activity.6|floatformat:3 }}</td>
+              {% endif %}
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">No hay actividad para esta agrupación.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
+  {% endif %}
 
-    <h2 class="mt-4">Reporte Ambiental Diario</h2>
+  <h2 class="mt-4">Estadísticas y Reportes</h2>
+  <div class="stats-container">
+    <h3>Totales Generales</h3>
+    <div class="filter-right">
+      <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+        <button type="submit">Actualizar</button>
+      </form>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Métrica</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Total CO2 Reducido</td>
+          <td>{{ total_co2_all }} kg</td>
+        </tr>
+        <tr>
+          <td>Total Puntos Acumulados</td>
+          <td>{{ total_puntos_all }}</td>
+        </tr>
+        <tr>
+          <td>Total Kg de Materiales</td>
+          <td>{{ total_kg_all }} kg</td>
+        </tr>
+        <tr>
+          <td>Material con Mayor Puntos</td>
+          <td>{{ max_puntos_material.0 }} ({{ max_puntos_material.1|floatformat:3 }} puntos)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>Actividad de Usuario</h3>
+    <div class="filter-center">
+      <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+        <input type="text" name="user_filter" value="{{ user_filter }}" placeholder="Filtrar por ID, correo o nombre">
+        <button type="submit">Filtrar</button>
+        <input type="hidden" name="reg_user_filter" value="{{ reg_user_filter }}">
+        <input type="hidden" name="reg_material_filter" value="{{ reg_material_filter }}">
+        <input type="hidden" name="reg_point_filter" value="{{ reg_point_filter }}">
+        <input type="hidden" name="reg_day_filter" value="{{ reg_day_filter }}">
+        <input type="hidden" name="reg_month_filter" value="{{ reg_month_filter }}">
+        <input type="hidden" name="reg_year_filter" value="{{ reg_year_filter }}">
+        <input type="hidden" name="order_by" value="{{ order_by }}">
+        <input type="hidden" name="group_by" value="{{ group_by }}">
+      </form>
+    </div>
+    {% if user_filter %}
+      <table class="user-activity-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Material</th>
+            <th>Total Kg</th>
+            <th>Total Puntos</th>
+            <th>Total CO2</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for activity in user_activity %}
+            <tr>
+              <td>{{ activity.0 }}</td>
+              <td>{{ activity.1 }}</td>
+              <td>{{ activity.2 }}</td>
+              <td>{{ activity.3|floatformat:3 }}</td>
+              <td>{{ activity.4|floatformat:3 }}</td>
+              <td>{{ activity.5|floatformat:3 }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="6">No hay actividad para este usuario.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+
+    <h3>Total por Tipo de Material</h3>
+    <div class="filter-right">
+      <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
+        <button type="submit">Actualizar</button>
+      </form>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th>Total Kg</th>
+          <th>Total CO2</th>
+          <th>Total Puntos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stat in material_stats %}
+          <tr>
+            <td>{{ stat.0 }}</td>
+            <td>{{ stat.1|floatformat:3 }}</td>
+            <td>{{ stat.2|floatformat:3 }}</td>
+            <td>{{ stat.3|floatformat:3 }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h3>Impacto Ambiental Diario</h3>
     <div class="filter-right">
       <form method="get" action="{% url 'admin_registros' %}" class="filter-form">
         <div>
@@ -304,14 +404,15 @@
         </tbody>
       </table>
     </div>
-  </main>
+  </div>
+</main>
 
-  <script>
-    function redirigirBitacora(url) {
-      if (url) {
-        window.location.href = url;
-      }
+<script>
+  function redirigirBitacora(url) {
+    if (url) {
+      window.location.href = url;
     }
-  </script>
+  }
+</script>
 </body>
 </html>

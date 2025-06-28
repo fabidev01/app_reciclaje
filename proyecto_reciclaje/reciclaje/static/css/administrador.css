@@ -9,6 +9,78 @@ body {
     justify-content: center;
 }
 
+/* Media Queries para responsividad */
+@media (max-width: 768px) {
+    .dashboard-header {
+        padding: 10px;
+    }
+    .dashboard-header h1 {
+        font-size: 20px;
+    }
+    .dashboard-header nav.dashboard-navigation-menu {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .dashboard-navigation-link,
+    .dashboard-bitacora-select {
+        font-size: 14px;
+        padding: 5px;
+    }
+    .tabla-usuarios,
+    .stats-container {
+        padding: 1em;
+        max-width: 90%;
+    }
+    .full-screen-table table,
+    .stats-container table {
+        font-size: 14px;
+    }
+    .filter-form {
+        flex-direction: column;
+        gap: 5px;
+    }
+    .filter-form div {
+        width: 100%;
+    }
+    .filter-form input,
+    .filter-form select,
+    .filter-form button {
+        width: 100%;
+        padding: 5px;
+    }
+    .admin-usuarios-modal-content,
+    .admin-catalogo-modal-content,
+    .admin-donacion-modal-content,
+    .admin-puntos-reciclaje-modal-content-box {
+        max-width: 90%;
+        padding: 15px;
+    }
+    .admin-panel-card-container {
+        grid-template-columns: 1fr;
+    }
+    .filter-center .filter-form {
+        flex-direction: column;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .dashboard-header nav.dashboard-navigation-menu {
+        gap: 10px;
+    }
+    .tabla-usuarios {
+        max-width: 85%;
+    }
+    .filter-form {
+        flex-wrap: wrap;
+    }
+    .filter-form div {
+        flex: 1 1 30%;
+    }
+    .admin-panel-card-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* Estilo para el encabezado */
 .dashboard-header {
     background: linear-gradient(135deg, #2c3e50, #34495e);
@@ -77,7 +149,6 @@ body {
     margin-top: 0.5em;
 }
 
-
 /* Estilo para el contenido principal del panel */
 .dashboard-main.admin-panel-main,
 .dashboard-main.admin-usuarios-main,
@@ -93,6 +164,82 @@ body {
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Ajuste para la sección de registros */
+.tabla-usuarios {
+    padding: 2em;
+    background-color: #ffffff;
+    overflow-x: auto;
+    margin-bottom: 20px;
+    max-width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.full-screen-table {
+    height: auto;
+    overflow-y: visible;
+    margin-bottom: 20px;
+    display: block;
+}
+
+/* Centrar el selector de agrupación y ajustar al contenido */
+.filter-center {
+    text-align: center;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%; /* Asegurar que ocupe el ancho total del contenedor */
+}
+
+.filter-center .filter-form {
+    display: inline-flex; /* Ajustar al contenido */
+    gap: 10px;
+    align-items: center;
+    width: auto; /* Eliminar ancho fijo */
+    margin: 0 auto; /* Centrar horizontalmente */
+}
+
+.filter-center .grouping-select {
+    padding: 5px;
+    width: auto; /* Ajustar al contenido */
+    min-width: 200px; /* Mínimo para que no se vea demasiado pequeño */
+}
+
+/* Uniformar colores de tablas */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+thead {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ffffff;
+}
+
+th,
+td {
+    padding: 1em;
+    text-align: center;
+    border: 1px solid #ddd;
+}
+
+td {
+    color: #333;
+}
+
+.stats-container table thead {
+    background: linear-gradient(135deg, #2c3e50, #34495e);
+    color: #ffffff;
+}
+
+.stats-container tbody {
+    background-color: #ffffff;
+}
+
+/* Resto de los estilos sin cambios */
 .admin-panel-message-container,
 .admin-usuarios-message,
 .admin-catalogo-message,
@@ -194,7 +341,6 @@ body {
     background: linear-gradient(135deg, #ffffff, #e0f7fa);
 }
 
-
 .admin-panel-card-history {
     background: linear-gradient(135deg, #ffffff, #f1f8e9);
 }
@@ -207,7 +353,6 @@ body {
     transform: translateY(-5px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
-
 
 .admin-panel-card-title {
     margin-bottom: 0.5em;
@@ -272,36 +417,6 @@ body {
     font-size: 20px;
 }
 
-.stats-container table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 0;
-    border-radius: 12px;
-    overflow: hidden;
-}
-
-.stats-container thead {
-    background: linear-gradient(135deg, #fff5db, #ffffff); /* Degradado verde vibrante */
-    color: #000000;
-}
-
-.stats-container th {
-    padding: 1em;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-.stats-container tbody {
-    background-color: #ffffff;
-}
-
-.stats-container td {
-    padding: 1em;
-    text-align: center;
-    border: 1px solid #ddd;
-    color: #333;
-}
-
 /* Ajuste del header para alinear el botón a la derecha */
 .dashboard-header {
     display: flex;
@@ -340,31 +455,18 @@ body {
 
 /* Eliminar estilos de imágenes ya que no se usarán */
 .admin-panel-card-image {
-    display: none; /* Ocultamos las imágenes */
+    display: none;
 }
 
 .parent-container {
-    display: flex;         /* Activa Flexbox */
-    align-items: center;   /* Centra verticalmente el contenido */
-    justify-content: flex-end; /* Alinea el contenido hacia la derecha */
-    padding-right: 10px;   /* Espaciado desde el borde derecho */
-    box-sizing: border-box;/* Asegura que el padding no afecte el tamaño total */
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+    box-sizing: border-box;
 }
-
 
 /* Tablas generales */
-.tabla-usuarios,
-.admin-usuarios-table-scroll,
-.admin-catalogo-table-scroll,
-.admin-donacion-table-scroll,
-.admin-puntos-reciclaje-table-container,
-.table-container-admin-historial {
-    padding: 2em;
-    background-color: #ffffff;
-    overflow-x: auto;
-    margin-bottom: 20px;
-}
-
 .tabla-usuarios h2,
 .admin-puntos-reciclaje-heading-title,
 .heading-title-admin-historial {
@@ -375,30 +477,6 @@ body {
     border-radius: 8px 8px 0 0;
     font-size: 24px;
     text-align: center;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-}
-
-thead {
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: #ffffff;
-}
-
-th,
-td {
-    padding: 1em;
-    text-align: center;
-    border: 1px solid #ddd;
-}
-
-td {
-    color: #333;
 }
 
 .edit-btn,
@@ -733,7 +811,7 @@ a {
     height: 50px;
     object-fit: cover;
     border-radius: 5px;
-    vertical-align: middle; /* Alinear verticalmente en la celda */
+    vertical-align: middle;
 }
 
 /* Asegurar que las celdas de la tabla no se vean afectadas por el tamaño de la imagen */
@@ -749,7 +827,7 @@ a {
 .admin-donacion-table img {
     max-width: 50px;
     max-height: 50px;
-    display: block; /* Evitar espacios extra debajo de la imagen */
+    display: block;
 }
 
 /* Animaciones */
@@ -762,4 +840,3 @@ a {
     from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
 }
-

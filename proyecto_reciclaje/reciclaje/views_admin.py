@@ -32,6 +32,8 @@ def es_admin(request):
         return False
 
 # Panel de administración
+
+
 def admin_panel(request):
     if not es_admin(request):
         if request.session.get('user_id'):
@@ -371,7 +373,9 @@ def admin_usuarios(request):
     response['Pragma'] = 'no-cache'
     response['Expires'] = '0'
     return response
+
 # Otras vistas de admin (ajustadas con cabeceras de caché)
+
 def admin_registros(request):
     if not es_admin(request):
         if request.session.get('user_id'):
@@ -390,17 +394,17 @@ def admin_registros(request):
     max_puntos_material = None
 
     # Filtros
-    reg_user_filter = request.GET.get('reg_user_filter', '')  # Filtrar usuario
-    reg_material_filter = request.GET.get('reg_material_filter', '')  # Filtrar material
-    reg_puntos_filter = request.GET.get('reg_puntos_filter', '')  # Filtro de puntos
-    reg_day_filter = request.GET.get('reg_day_filter', '')  # Filtro por día
-    reg_month_filter = request.GET.get('reg_month_filter', '')  # Filtro por mes
-    reg_year_filter = request.GET.get('reg_year_filter', '')  # Filtro por año
-    reg_point_filter = request.GET.get('reg_point_filter', '')  # Filtro por punto
-    user_filter = request.GET.get('user_filter', '')  # Filtrar usuario en actividad
-    impacto_mes_filter = request.GET.get('impacto_mes_filter', '')  # Filtro por mes para impacto
-    impacto_anno_filter = request.GET.get('impacto_anno_filter', '')  # Filtro por año para impacto
-    order_by = request.GET.get('order_by', '')  # Criterio de ordenamiento
+    reg_user_filter = request.GET.get('reg_user_filter', '')
+    reg_material_filter = request.GET.get('reg_material_filter', '')
+    reg_point_filter = request.GET.get('reg_point_filter', '')
+    reg_day_filter = request.GET.get('reg_day_filter', '')
+    reg_month_filter = request.GET.get('reg_month_filter', '')
+    reg_year_filter = request.GET.get('reg_year_filter', '')
+    user_filter = request.GET.get('user_filter', '')
+    impacto_mes_filter = request.GET.get('impacto_mes_filter', '')
+    impacto_anno_filter = request.GET.get('impacto_anno_filter', '')
+    order_by = request.GET.get('order_by', '')
+    group_by = request.GET.get('group_by', '')
 
     try:
         with connection.cursor() as cursor:
@@ -410,11 +414,11 @@ def admin_registros(request):
                     rr.id_registro_reciclaje,
                     u.nombre AS nombre_usuario,
                     u.correo AS correo_usuario,
-                    pr.nombre AS nombre_punto,
-                    rr.cantidad_kg,
-                    rr.puntos_obtenidos,
-                    rr.co2_reducido,
                     mr.nombre AS nombre_material,
+                    pr.nombre AS nombre_punto,
+                    rr.puntos_obtenidos,
+                    rr.cantidad_kg,
+                    rr.co2_reducido,
                     rr.fecha_registro
                 FROM Registro_Reciclaje rr
                 LEFT JOIN Usuario u ON rr.id_usuario = u.id_usuario
@@ -439,14 +443,14 @@ def admin_registros(request):
                 except ValueError:
                     params.append(reg_material_filter)
                 params.append('%' + reg_material_filter + '%')
-            if reg_puntos_filter:
-                query += " AND (rr.puntos_obtenidos = %s)"
+            if reg_point_filter:
+                query += " AND (pr.id_punto_reciclaje = %s OR pr.nombre LIKE %s)"
                 try:
-                    puntos = float(reg_puntos_filter) if reg_puntos_filter.replace('.', '').isdigit() else None
-                    params.append(puntos if puntos else reg_puntos_filter)
+                    point_id = int(reg_point_filter) if reg_point_filter.isdigit() else None
+                    params.append(point_id if point_id else reg_point_filter)
                 except ValueError:
-                    params.append(reg_puntos_filter)
-            # Filtros de fecha independientes
+                    params.append(reg_point_filter)
+                params.append('%' + reg_point_filter + '%')
             if reg_day_filter:
                 query += " AND DAY(rr.fecha_registro) = %s"
                 try:
@@ -474,15 +478,6 @@ def admin_registros(request):
                     params.append(year)
                 except ValueError:
                     messages.error(request, 'Año inválido. Use un valor numérico.')
-            if reg_point_filter:
-                query += " AND (pr.id_punto_reciclaje = %s OR pr.nombre LIKE %s)"
-                try:
-                    point_id = int(reg_point_filter) if reg_point_filter.isdigit() else None
-                    params.append(point_id if point_id else reg_point_filter)
-                except ValueError:
-                    params.append(reg_point_filter)
-                params.append('%' + reg_point_filter + '%')
-            # Ordenamiento de mayor a menor
             if order_by:
                 order_mapping = {
                     'kg': 'rr.cantidad_kg DESC',
@@ -505,8 +500,7 @@ def admin_registros(request):
                     SUM(rr.puntos_obtenidos) AS total_puntos
                 FROM Registro_Reciclaje rr
                 JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
-                GROUP BY mr.nombre
-                ORDER BY total_kg DESC
+                GROUP BY mr.id_material_reciclable, mr.nombre
                 """
             )
             material_stats = cursor.fetchall()
@@ -532,38 +526,137 @@ def admin_registros(request):
                 SELECT mr.nombre, SUM(rr.puntos_obtenidos) AS max_puntos
                 FROM Registro_Reciclaje rr
                 JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
-                GROUP BY mr.nombre
+                GROUP BY mr.id_material_reciclable, mr.nombre
                 ORDER BY max_puntos DESC
                 LIMIT 1
                 """
             )
             max_puntos_material = cursor.fetchone()
 
-            # Actividad de usuario solo si hay filtro
-            if user_filter:
-                query = """
-                    SELECT 
-                        u.nombre AS usuario,
-                        mr.nombre AS material,
-                        SUM(rr.cantidad_kg) AS total_kg,
-                        SUM(rr.puntos_obtenidos) AS total_puntos,
-                        SUM(rr.co2_reducido) AS total_co2
-                    FROM Registro_Reciclaje rr
-                    JOIN Usuario u ON rr.id_usuario = u.id_usuario
-                    JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
-                    WHERE (u.id_usuario = %s OR u.correo LIKE %s OR u.nombre LIKE %s)
-                    GROUP BY u.id_usuario, mr.id_material_reciclable
-                """
-                try:
-                    user_id = int(user_filter) if user_filter.isdigit() else None
-                    params = [user_id if user_id else user_filter, '%' + user_filter + '%', '%' + user_filter + '%']
-                except ValueError:
-                    params = [user_filter, '%' + user_filter + '%', '%' + user_filter + '%']
-                cursor.execute(query, params)
-                user_activity = cursor.fetchall()
+            # Actividad agrupada según group_by o user_filter
+            if group_by or user_filter:
+                if group_by == 'usuario_material' or user_filter:
+                    query = """
+                        SELECT 
+                            u.id_usuario AS id,
+                            u.nombre AS usuario,
+                            mr.nombre AS material,
+                            SUM(rr.cantidad_kg) AS total_kg,
+                            SUM(rr.puntos_obtenidos) AS total_puntos,
+                            SUM(rr.co2_reducido) AS total_co2
+                        FROM Registro_Reciclaje rr
+                        JOIN Usuario u ON rr.id_usuario = u.id_usuario
+                        JOIN Material_Reciclable mr ON rr.id_material_reciclable = mr.id_material_reciclable
+                        WHERE 1=1
+                    """
+                    params = []
+                    if reg_user_filter or user_filter:
+                        query += " AND (u.id_usuario = %s OR u.correo LIKE %s OR u.nombre LIKE %s)"
+                        user_id_to_filter = user_filter if user_filter else reg_user_filter
+                        try:
+                            user_id = int(user_id_to_filter) if user_id_to_filter.isdigit() else None
+                            params.append(user_id if user_id else user_id_to_filter)
+                        except ValueError:
+                            params.append(user_id_to_filter)
+                        params.extend(['%' + user_id_to_filter + '%', '%' + user_id_to_filter + '%'])
+                    if reg_material_filter:
+                        query += " AND (mr.id_material_reciclable = %s OR mr.nombre LIKE %s)"
+                        try:
+                            material_id = int(reg_material_filter) if reg_material_filter.isdigit() else None
+                            params.append(material_id if material_id else reg_material_filter)
+                        except ValueError:
+                            params.append(reg_material_filter)
+                        params.append('%' + reg_material_filter + '%')
+                    if reg_day_filter:
+                        query += " AND DAY(rr.fecha_registro) = %s"
+                        try:
+                            day = int(reg_day_filter)
+                            if 1 <= day <= 31:
+                                params.append(day)
+                        except ValueError:
+                            pass
+                    if reg_month_filter:
+                        query += " AND MONTH(rr.fecha_registro) = %s"
+                        try:
+                            month = int(reg_month_filter)
+                            if 1 <= month <= 12:
+                                params.append(month)
+                        except ValueError:
+                            pass
+                    if reg_year_filter:
+                        query += " AND YEAR(rr.fecha_registro) = %s"
+                        try:
+                            year = int(reg_year_filter)
+                            params.append(year)
+                        except ValueError:
+                            pass
+                    query += " GROUP BY u.id_usuario, u.nombre, mr.id_material_reciclable, mr.nombre"
+                    query += " ORDER BY CASE WHEN mr.nombre = 'Plástico' THEN 0 ELSE 1 END, mr.id_material_reciclable ASC"
+                    cursor.execute(query, params)
+                    user_activity = cursor.fetchall()
 
-            # Impacto ambiental diario: solo el día actual a menos que se apliquen filtros
-            current_date = datetime.now().date()  # 04:29 PM -04 on Thursday, June 26, 2025
+                elif group_by == 'usuario_punto':
+                    query = """
+                        SELECT 
+                            u.id_usuario AS id,
+                            u.nombre AS usuario,
+                            pr.id_punto_reciclaje AS punto_id,
+                            pr.nombre AS punto_nombre,
+                            SUM(rr.cantidad_kg) AS total_kg,
+                            SUM(rr.puntos_obtenidos) AS total_puntos,
+                            SUM(rr.co2_reducido) AS total_co2
+                        FROM Registro_Reciclaje rr
+                        JOIN Usuario u ON rr.id_usuario = u.id_usuario
+                        LEFT JOIN Punto_Reciclaje pr ON rr.id_punto_reciclaje = pr.id_punto_reciclaje
+                        WHERE 1=1
+                    """
+                    params = []
+                    if reg_user_filter:
+                        query += " AND (u.id_usuario = %s OR u.correo LIKE %s OR u.nombre LIKE %s)"
+                        try:
+                            user_id = int(reg_user_filter) if reg_user_filter.isdigit() else None
+                            params.append(user_id if user_id else reg_user_filter)
+                        except ValueError:
+                            params.append(reg_user_filter)
+                        params.extend(['%' + reg_user_filter + '%', '%' + reg_user_filter + '%'])
+                    if reg_point_filter:
+                        query += " AND (pr.id_punto_reciclaje = %s OR pr.nombre LIKE %s)"
+                        try:
+                            point_id = int(reg_point_filter) if reg_point_filter.isdigit() else None
+                            params.append(point_id if point_id else reg_point_filter)
+                        except ValueError:
+                            params.append(reg_point_filter)
+                        params.append('%' + reg_point_filter + '%')
+                    if reg_day_filter:
+                        query += " AND DAY(rr.fecha_registro) = %s"
+                        try:
+                            day = int(reg_day_filter)
+                            if 1 <= day <= 31:
+                                params.append(day)
+                        except ValueError:
+                            pass
+                    if reg_month_filter:
+                        query += " AND MONTH(rr.fecha_registro) = %s"
+                        try:
+                            month = int(reg_month_filter)
+                            if 1 <= month <= 12:
+                                params.append(month)
+                        except ValueError:
+                            pass
+                    if reg_year_filter:
+                        query += " AND YEAR(rr.fecha_registro) = %s"
+                        try:
+                            year = int(reg_year_filter)
+                            params.append(year)
+                        except ValueError:
+                            pass
+                    query += " GROUP BY u.id_usuario, u.nombre, pr.id_punto_reciclaje, pr.nombre"
+                    query += " ORDER BY pr.nombre ASC"  # Ordenamiento por nombre de punto
+                    cursor.execute(query, params)
+                    user_activity = cursor.fetchall()
+
+            # Impacto ambiental diario
+            current_date = datetime.now().date()  # 06:20 AM -04 on Saturday, June 28, 2025
             query = """
                 SELECT 
                     id_impacto_ambiental_diario,
@@ -602,16 +695,16 @@ def admin_registros(request):
         'user_activity': user_activity,
         'reg_user_filter': reg_user_filter,
         'reg_material_filter': reg_material_filter,
-        'reg_puntos_filter': reg_puntos_filter,
+        'reg_point_filter': reg_point_filter,
         'reg_day_filter': reg_day_filter,
         'reg_month_filter': reg_month_filter,
         'reg_year_filter': reg_year_filter,
-        'reg_point_filter': reg_point_filter,
         'user_filter': user_filter,
         'impacto_ambiental': impacto_ambiental,
         'impacto_mes_filter': impacto_mes_filter,
         'impacto_anno_filter': impacto_anno_filter,
-        'order_by': order_by
+        'order_by': order_by,
+        'group_by': group_by
     })
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
@@ -995,19 +1088,43 @@ def bitacora_reciclaje(request):
             return redirect('dashboard')
         else:
             return redirect('login')
+    
     bitacora = []
+    search_query = request.GET.get('search', '').strip()
+    
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                """
+            query = """
                 SELECT id_bitacora_reciclaje, ip, id_registro_reciclaje, accion, 
                        DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y %%H:%%i') AS fecha_accion, detalle
                 FROM Bitacora_Reciclaje
+            """
+            params = []
+            if search_query:
+                query += """
+                    WHERE id_bitacora_reciclaje LIKE %s 
+                    OR ip LIKE %s 
+                    OR detalle LIKE %s
                 """
-            )
-            bitacora = cursor.fetchall()
+                params = ['%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%']
+            
+            cursor.execute(query, params)
+            raw_bitacora = cursor.fetchall()
+            
+            # Procesar cada entrada para extraer el usuario
+            for entry in raw_bitacora:
+                detalle = entry[5] or ""
+                usuario = "Usuario Externo"
+                if (detalle.startswith("Registro creado por ") and ": " in detalle[17:]) or \
+                   (detalle.startswith("Registro actualizado por ") and ": " in detalle[19:]) or \
+                   (detalle.startswith("Registro eliminado por ") and ": " in detalle[18:]):
+                    usuario_part = detalle.split(": ")[0]
+                    usuario = usuario_part.split("por ")[1] if "por " in usuario_part else usuario
+                bitacora.append((entry[0], entry[1], entry[3], entry[4], entry[5], usuario))  # (id, ip, accion, fecha, detalle, usuario)
+    
     except Exception as e:
         messages.error(request, f'Error al cargar bitácora: {str(e)}')
+    
     response = render(request, 'administrador/bitacora_reciclaje.html', {'bitacora': bitacora})
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
@@ -1021,19 +1138,43 @@ def bitacora_catalogo(request):
             return redirect('dashboard')
         else:
             return redirect('login')
+    
     bitacora = []
+    search_query = request.GET.get('search', '').strip()
+    
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                """
+            query = """
                 SELECT id_bitacora_catalogo, ip, id_catalogo_recompensa, accion, 
                        DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y %%H:%%i') AS fecha_accion, detalle
                 FROM Bitacora_Catalogo
+            """
+            params = []
+            if search_query:
+                query += """
+                    WHERE id_bitacora_catalogo LIKE %s 
+                    OR ip LIKE %s 
+                    OR detalle LIKE %s
                 """
-            )
-            bitacora = cursor.fetchall()
+                params = ['%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%']
+            
+            cursor.execute(query, params)
+            raw_bitacora = cursor.fetchall()
+            
+            # Procesar cada entrada para extraer el usuario
+            for entry in raw_bitacora:
+                detalle = entry[5] or ""
+                usuario = "Usuario Externo"
+                if (detalle.startswith("Recompensa creada por ") and ": " in detalle[19:]) or \
+                   (detalle.startswith("Recompensa actualizada por ") and ": " in detalle[23:]) or \
+                   (detalle.startswith("Recompensa eliminada por ") and ": " in detalle[23:]):
+                    usuario_part = detalle.split(": ")[0]
+                    usuario = usuario_part.split("por ")[1] if "por " in usuario_part else usuario
+                bitacora.append((entry[0], entry[1], entry[3], entry[4], entry[5], usuario))  # (id, ip, accion, fecha, detalle, usuario)
+    
     except Exception as e:
         messages.error(request, f'Error al cargar bitácora: {str(e)}')
+    
     response = render(request, 'administrador/bitacora_catalogo.html', {'bitacora': bitacora})
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'
@@ -1047,19 +1188,43 @@ def bitacora_canje(request):
             return redirect('dashboard')
         else:
             return redirect('login')
+    
     bitacora = []
+    search_query = request.GET.get('search', '').strip()
+    
     try:
         with connection.cursor() as cursor:
-            cursor.execute(
-                """
+            query = """
                 SELECT id_bitacora_canje, ip, id_canje_recompensa, id_catalogo_recompensa, accion, 
                        DATE_FORMAT(fecha_accion, '%%d/%%m/%%Y %%H:%%i') AS fecha_accion, detalle
                 FROM Bitacora_Canje
+            """
+            params = []
+            if search_query:
+                query += """
+                    WHERE id_bitacora_canje LIKE %s 
+                    OR ip LIKE %s 
+                    OR detalle LIKE %s
                 """
-            )
-            bitacora = cursor.fetchall()
+                params = ['%' + search_query + '%', '%' + search_query + '%', '%' + search_query + '%']
+            
+            cursor.execute(query, params)
+            raw_bitacora = cursor.fetchall()
+            
+            # Procesar cada entrada para extraer el usuario
+            for entry in raw_bitacora:
+                detalle = entry[6] or ""
+                usuario = "Usuario Externo"
+                if (detalle.startswith("Canje creado por ") and ": " in detalle[14:]) or \
+                   (detalle.startswith("Canje actualizado por ") and ": " in detalle[18:]) or \
+                   (detalle.startswith("Canje eliminado por ") and ": " in detalle[18:]):
+                    usuario_part = detalle.split(": ")[0]
+                    usuario = usuario_part.split("por ")[1] if "por " in usuario_part else usuario
+                bitacora.append((entry[0], entry[1], entry[4], entry[5], detalle, usuario))  # (id, ip, accion, fecha, detalle, usuario)
+    
     except Exception as e:
         messages.error(request, f'Error al cargar bitácora: {str(e)}')
+    
     response = render(request, 'administrador/bitacora_canje.html', {'bitacora': bitacora})
     response['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
     response['Pragma'] = 'no-cache'

@@ -602,10 +602,10 @@ def registro_reciclaje(request):
 
     try:
         with connection.cursor() as cursor:
-            # Obtener puntos disponibles
+            # Obtener puntos disponibles con capacidad máxima
             cursor.execute(
                 """
-                SELECT id_punto_reciclaje, nombre, latitud, longitud
+                SELECT DISTINCT id_punto_reciclaje, nombre, latitud, longitud, COALESCE(capacidad_maxima, 1000.0) AS capacidad_maxima
                 FROM Punto_Reciclaje
                 WHERE estado_punto = 'Disponible'
                 """
@@ -620,12 +620,13 @@ def registro_reciclaje(request):
                     'id_punto_reciclaje': punto[0],
                     'nombre': punto[1],
                     'latitud': float(punto[2]),
-                    'longitud': float(punto[3])
+                    'longitud': float(punto[3]),
+                    'capacidad_maxima': float(punto[4])
                 }
                 for punto in puntos_raw
             ]
 
-            # Obtener materiales disponibles para el punto seleccionado o todos si no hay selección
+            # Obtener materiales disponibles
             if selected_punto:
                 cursor.execute(
                     """
@@ -637,7 +638,12 @@ def registro_reciclaje(request):
                     [selected_punto]
                 )
             else:
-                cursor.execute("SELECT id_material_reciclable, nombre FROM Material_Reciclable")
+                cursor.execute(
+                    """
+                    SELECT DISTINCT id_material_reciclable, nombre
+                    FROM Material_Reciclable
+                    """
+                )
             materiales = cursor.fetchall()
             if not materiales:
                 messages.error(request, 'No hay materiales reciclables disponibles para este punto.')
@@ -666,6 +672,26 @@ def registro_reciclaje(request):
                         messages.error(request, 'El material seleccionado no es válido para este punto de reciclaje.')
                         return redirect('registro_reciclaje')
 
+                    # Verificar capacidad máxima del punto
+                    cursor.execute(
+                        """
+                        SELECT COALESCE(capacidad_maxima, 1000.0), COALESCE(SUM(cantidad_kg), 0) AS total_kg
+                        FROM Punto_Reciclaje pr
+                        LEFT JOIN Registro_Reciclaje rr ON pr.id_punto_reciclaje = rr.id_punto_reciclaje
+                        WHERE pr.id_punto_reciclaje = %s
+                        GROUP BY pr.id_punto_reciclaje, pr.capacidad_maxima
+                        """,
+                        [id_punto]
+                    )
+                    capacidad_data = cursor.fetchone()
+                    logger.info(f"Capacidad data: {capacidad_data}, cantidad: {cantidad}")
+                    if capacidad_data:
+                        capacidad_maxima, total_kg = capacidad_data
+                        if total_kg + float(cantidad) > capacidad_maxima:
+                            messages.error(request, 'No se puede registrar: la capacidad máxima del punto ha sido excedida.')
+                            logger.info("Capacidad máxima excedida detectada")
+                            return redirect('registro_reciclaje')
+
                     try:
                         cursor.callproc('insertar_registro_reciclaje', [
                             user_id,
@@ -679,13 +705,20 @@ def registro_reciclaje(request):
                         messages.success(request, '¡Registro de reciclaje exitoso!')
                         return redirect('dashboard')
                     except Exception as e:
-                        messages.error(request, f'Error al registrar: {str(e)}')
                         connection.rollback()
+                        error_msg = str(e)
+                        if 'capacidad máxima' in error_msg.lower():
+                            messages.error(request, 'No se puede registrar: la capacidad máxima del punto ha sido excedida.')
+                        else:
+                            messages.error(request, f'Error al registrar: {error_msg}')
+                        logger.error(f"Error en registro: {error_msg}")
+                        return redirect('registro_reciclaje')
+
     except Exception as e:
         messages.error(request, f'Error al cargar datos: {str(e)}')
+        logger.error(f"Error al cargar datos: {str(e)}")
 
-    # Determinar qué template usar
-    template = 'usuario_regular/mapa.html'  # Usamos mapa.html como base
+    template = 'usuario_regular/mapa.html'
     response = render(request, template, {
         'materiales': materiales,
         'puntos': puntos,

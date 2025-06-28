@@ -1,7 +1,5 @@
 /* Estilos generales */
-
-
-h1{
+h1 {
   text-align: center;
 }
 body {
@@ -19,8 +17,6 @@ body {
 }
 
 /* Estilos para body específico de formularios (login y registro) */
-
-
 .form-body {
   display: flex;
   align-items: center;
@@ -41,6 +37,8 @@ header,
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: relative;
+  z-index: 1002; /* Justo debajo del mensaje */
 }
 
 .dashboard-header h1 {
@@ -58,7 +56,7 @@ header,
   color: white;
   text-decoration: none;
   font-weight: bold;
-  padding: 15px; /* Añadido del admin.css */
+  padding: 15px;
 }
 
 .dashboard-header nav a:hover {
@@ -203,13 +201,15 @@ select {
   margin-top: 0%;
   width: 100%;
   height: 100vh;
+  z-index: 1000; /* Debajo del mensaje */
+  position: relative;
 }
 
 /* Estilos de modal (registro reciclaje) */
 .modal {
   display: none;
   position: fixed;
-  z-index: 1001;
+  z-index: 1001; /* Entre el mapa y el mensaje */
   left: 0;
   top: 0;
   width: 100%;
@@ -220,7 +220,7 @@ select {
 
 .modal-content {
   background-color: #fff;
-  margin: 5% auto;
+  margin: 10% auto;
   padding: 20px;
   border-radius: 10px;
   width: 90%;
@@ -247,7 +247,6 @@ select {
 .imagen-inicio {
   max-width: 40vw;
 }
-
 
 /* Estilos de footer */
 footer {
@@ -414,7 +413,7 @@ table td {
   background-color: #2e7d32;
 }
 
-/* Estilos de mensajes de error */
+/* Estilos de mensajes de error (manteniendo el original pero integrando) */
 .error-message {
   color: #d32f2f;
   background-color: #ffebee;
@@ -423,7 +422,8 @@ table td {
   margin-bottom: 1em;
   text-align: center;
 }
-/* Mensajes personalizados */
+
+/* Mensajes personalizados (integrando con Django messages) */
 .custom-messages {
   position: fixed;
   top: 20px;
@@ -447,60 +447,91 @@ table td {
   animation: slideDown 0.3s ease forwards;
 }
 
-/* Colores por tipo de mensaje */
-.custom-message.success{
-  background-color: #28a745; 
+/* Colores por tipo de mensaje (alineando con Django messages) */
+.custom-message.success {
+  background-color: #28a745;
 }
 .custom-message.error {
   background-color: #dc3545;
 }
 
 .custom-message.warning {
-  background-color: #ffc107; 
+  background-color: #ffc107;
   color: #000 !important;
 }
 .custom-message.info {
-  background-color: #17a2b8; 
+  background-color: #17a2b8;
+}
+
+/* Contenedor de mensajes de Django (ajustado para estar debajo del nav) */
+.message-container {
+  position: fixed;
+  top: 100px; /* Ajustado para estar debajo del encabezado y nav (aprox. altura total) */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1003; /* Mayor prioridad para estar por encima de todo excepto el encabezado */
+  width: 90%;
+  max-width: 600px;
+  text-align: center;
+}
+
+.message {
+  padding: 1em;
+  margin-bottom: 1em;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: block; /* Asegurar que cada mensaje ocupe su propio espacio */
+}
+
+.message.success {
+  background-color: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.message.error {
+  background-color: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
 }
 
 .cost-container {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #dfe6e9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dfe6e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .cost-container .cost-value {
-    font-weight: 600;
-    color: #2d3436;
-    font-size: 1.1em;
+  font-weight: 600;
+  color: #2d3436;
+  font-size: 1.1em;
 }
 
 .cost-container .cost-unit {
-    font-size: 0.9em;
-    color: #636e72;
-    font-style: italic;
+  font-size: 0.9em;
+  color: #636e72;
+  font-style: italic;
 }
 
 .cost-container .cost-equivalence {
-    font-size: 0.85em;
-    color: #00b894;
-    background-color: #e6fffa;
-    padding: 2px 6px;
-    border-radius: 4px;
+  font-size: 0.85em;
+  color: #00b894;
+  background-color: #e6fffa;
+  padding: 2px 6px;
+  border-radius: 4px;
 }
-
-
 
 /* Controles de cantidad */
 .cantidad-control {
-    display: flex;
-    align-items: center;
-    gap: 5px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .count-input {
@@ -538,22 +569,21 @@ table td {
 
 /* Estilo para tablas con scroll */
 .tabla-scroll {
-    max-height: 400px;  
-    width: 100%; 
+  max-height: 400px;
+  width: 100%;
 }
 
 /* Asegurar que la tabla dentro de tabla-scroll sea responsiva */
 .tabla-scroll table {
-    width: 100%;
-    
+  width: 100%;
 }
 
 /* Asegurar que el thead se mantenga fijo (opcional, para mejor UX) */
 .tabla-scroll thead {
-    position: sticky;
-    top: 0;
-    z-index: 1;
-    background-color: #a5d6a7; /* Fondo del encabezado */
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background-color: #a5d6a7;
 }
 
 .history-selector-container {
@@ -616,30 +646,6 @@ table td {
   max-width: 600px;
   margin: 0 auto;
 }
-
-/* Mensajes de Django */
-.message {
-  padding: 1em;
-  margin-bottom: 1em;
-  border-radius: 5px;
-  text-align: center;
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.message.success {
-  background-color: #d4edda;
-  color: #155724;
-  border: 1px solid #c3e6cb;
-}
-
-.message.error {
-  background-color: #f8d7da;
-  color: #721c24;
-  border: 1px solid #f5c6cb;
-}
-
-/* Estilos existentes... */
 
 /* Sección Eco-Hero */
 .eco-hero {
@@ -802,10 +808,10 @@ table td {
 }
 
 .imagen-tabla {
-  max-width: 100px; /* Tamaño máximo para que quepa en la celda */
-  height: auto; /* Mantiene la proporción */
-  display: block; /* Para centrar con margin */
-  margin: 0 auto; /* Centra horizontalmente */
-  border-radius: 5px; /* Bordes redondeados opcionales */
-  object-fit: cover; /* Ajusta la imagen sin distorsionarla */
+  max-width: 100px;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  border-radius: 5px;
+  object-fit: cover;
 }

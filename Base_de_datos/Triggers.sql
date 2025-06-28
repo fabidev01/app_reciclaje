@@ -30,24 +30,42 @@ BEGIN
 END //
 
 -- para actualizar el balance de puntos del usuario al registrar un nuevo registro reciclaje
+DELIMITER //
 CREATE TRIGGER before_registro_reciclaje_insert
 BEFORE INSERT ON Registro_Reciclaje
 FOR EACH ROW
 BEGIN
     DECLARE puntos INT;
     DECLARE co2 FLOAT;
+    DECLARE capacidad_usada FLOAT;
+    DECLARE capacidad_max INT;
+
     SELECT puntos_por_unidad, co2_por_unidad
     INTO puntos, co2
     FROM Material_Reciclable
     WHERE id_material_reciclable = NEW.id_material_reciclable;
-    
+
     SET NEW.puntos_obtenidos = puntos * NEW.cantidad_kg;
     SET NEW.co2_reducido = co2 * NEW.cantidad_kg;
-    
+
+    -- Calcular capacidad usada en el punto
+    SELECT COALESCE(SUM(cantidad_kg), 0), pr.capacidad_maxima
+    INTO capacidad_usada, capacidad_max
+    FROM Registro_Reciclaje rr
+    JOIN Punto_Reciclaje pr ON rr.id_punto_reciclaje = pr.id_punto_reciclaje
+    WHERE rr.id_punto_reciclaje = NEW.id_punto_reciclaje
+    GROUP BY pr.capacidad_maxima;
+
+    IF (capacidad_usada + NEW.cantidad_kg) > capacidad_max THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Error: La capacidad máxima del punto de reciclaje ha sido excedida.';
+    END IF;
+
     UPDATE Usuario 
     SET balance_puntos = balance_puntos + (puntos * NEW.cantidad_kg)
     WHERE id_usuario = NEW.id_usuario;
 END //
+DELIMITER ;
 
 -- bitacora INSERT Registro_Reciclaje
 CREATE TRIGGER after_registro_reciclaje_insert_bitacora

@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Pasar datos como elementos JSON seguros -->
   {% if puntos %}
     {{ puntos|json_script:"initial-puntos-data" }}
   {% endif %}
@@ -16,16 +15,32 @@
 </head>
 
 <body class="form-body-map">
+  <!-- Mensajes fijos debajo del nav -->
+  {% if messages %}
+    <div class="message-container">
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   <div class="dashboard-header">
     <h1>Puntos de Reciclaje Disponibles</h1>
+    <nav>
+    <div class="container">
+      <nav>
+          <a href="{% url 'dashboard' %}">Dashboard</a>
+          <a href="{% url 'registro_reciclaje' %}">Registrar Reciclaje</a>
+          <a href="{% url 'catalogo' %}">Catálogo</a>
+          <a href="{% url 'donacion' %}">Donacion</a>
+          <a href="{% url 'historial' %}">Historial</a>
+          <a href="{% url 'logout' %}">Cerrar Sesión</a>
+      </nav>
+    </div>
+    </nav>
   </div>
   <div class="container">
     <div id="map" class="map-container"></div>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="error-message {{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
   </div>
 
   <!-- Modal para registrar reciclaje -->

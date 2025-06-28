@@ -6,6 +6,55 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Bitácora de Catálogo</title>
   <link rel="stylesheet" href="{% static 'css/administrador.css' %}" />
+  <style>
+    .full-screen-table {
+      height: 70vh;
+      overflow-y: auto;
+      margin-bottom: 20px;
+      display: block;
+    }
+    .filter-right {
+      text-align: right;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    .filter-form {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    .filter-form input, .filter-form select {
+      padding: 5px;
+    }
+    .filter-form button {
+      padding: 5px 10px;
+      background: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #fff;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border-radius: 10px;
+    }
+    th {
+      background: linear-gradient(135deg, #2c3e50, #34495e);
+      color: white;
+      padding: 1em;
+      text-align: center;
+      border: 1px solid #ddd;
+    }
+    td {
+      padding: 1em;
+      text-align: center;
+      border: 1px solid #ddd;
+      color: #333;
+    }
+  </style>
 </head>
 <body class="dashboard-body">
 <header class="dashboard-header">
@@ -23,55 +72,66 @@
       <select name="lista-bitacora-menu" id="lista-bitacora-menu" onchange="redirigirBitacora(this.value)" class="dashboard-bitacora-select">
         <option value="#">Bitácoras ↓</option>
         <option value="{% url 'bitacora_reciclaje' %}">Bitácora Reciclaje</option>
-        <option value="{% url 'bitacora_catalogo' %}">Bitácora de Catálogo</option>
+        <option value="{% url 'bitacora_catalogo' %}" selected>Bitácora de Catálogo</option>
         <option value="{% url 'bitacora_canje' %}">Bitácora de Canje</option>
       </select>
       <a href="{% url 'logout' %}" class="dashboard-navigation-link">Cerrar Sesión</a>
     </nav>
-  </header>
-  <main class="tabla-usuarios">
-    <h2>Bitácora de Catálogo</h2>
-    {% if messages %}
-      {% for message in messages %}
-        <div class="error-message {{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+</header>
+
+<main class="tabla-usuarios">
+  <h2>Bitácora de Catálogo</h2>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="admin-panel-message-error">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <div class="filter-right">
+    <form method="get" action="{% url 'bitacora_catalogo' %}" class="filter-form">
+      <input type="text" name="search" value="{{ request.GET.search }}" placeholder="Buscar por ID, usuario o IP">
+      <button type="submit">Filtrar</button>
+    </form>
+  </div>
+
+  <div class="full-screen-table">
     <table>
       <thead>
         <tr>
-          <th>ID</th>
+          <th>ID Bitácora</th>
+          <th>Usuario</th>
           <th>IP</th>
-          <th>ID Catálogo</th>
           <th>Acción</th>
-          <th>Fecha</th>
           <th>Detalle</th>
+          <th>Fecha Acción</th>
         </tr>
       </thead>
       <tbody>
-        {% for entrada in bitacora %}
+        {% for entry in bitacora %}
           <tr>
-            <td>{{ entrada.0 }}</td>
-            <td>{{ entrada.1 }}</td>
-            <td>{{ entrada.2 }}</td>
-            <td>{{ entrada.3 }}</td>
-            <td>{{ entrada.4 }}</td>
-            <td>{{ entrada.5 }}</td>
+            <td>{{ entry.0 }}</td> <!-- id_bitacora_catalogo -->
+            <td>{{ entry.5 }}</td> <!-- usuario -->
+            <td>{{ entry.1|default:"No disponible" }}</td> <!-- ip -->
+            <td>{{ entry.2 }}</td> <!-- accion -->
+            <td>{{ entry.4 }}</td> <!-- detalle -->
+            <td>{{ entry.3 }}</td> <!-- fecha_accion -->
           </tr>
         {% empty %}
           <tr>
-            <td colspan="6">No hay entradas en la bitácora de catálogo.</td>
+            <td colspan="6">No hay registros en la bitácora de catálogo.</td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
-  </main>
+  </div>
+</main>
 
-  <script>
-    function redirigirBitacora(url) {
-      if (url) {
-        window.location.href = url;
-      }
+<script>
+  function redirigirBitacora(url) {
+    if (url) {
+      window.location.href = url;
     }
-  </script>
+  }
+</script>
 </body>
 </html>
