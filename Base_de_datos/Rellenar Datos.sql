@@ -26,8 +26,8 @@ INSERT INTO Usuario (nombre, correo, telefono, balance_puntos, fecha_registro, c
 ('Administrador', 'admin@gmail.com', '77712345', 100, STR_TO_DATE('01/03/2025', '%d/%m/%Y'), '123', '192.168.1.1', 1),
 ('Ana Quispe', 'ana.quispe@gmail.com', '66654321', 50, STR_TO_DATE('02/03/2025', '%d/%m/%Y'), '123', '192.168.1.2', 2),
 ('Pedro Vargas', 'pedro.vargas@gmail.com', '77765432', 200, STR_TO_DATE('03/03/2025', '%d/%m/%Y'), '123', '192.168.1.3', 2),
-('María Rojas', 'maria.rojas@gmail.com', '66612345', 80, STR_TO_DATE('04/03/2025', '%d/%m/%Y'), '123', '192.168.1.4', 3),
-('Carlos Mamani', 'carlos.mamani@gmail.com', '77798765', 150, STR_TO_DATE('05/03/2025', '%d/%m/%Y'), '123', '192.168.1.5', 4);
+('María Rojas', 'maria.rojas@gmail.com', '66612345', 80, STR_TO_DATE('04/03/2025', '%d/%m/%Y'), '123', '192.168.1.4', 2),
+('Carlos Mamani', 'carlos.mamani@gmail.com', '77798765', 150, STR_TO_DATE('05/03/2025', '%d/%m/%Y'), '123', '192.168.1.5', 2);
 
 -- Insertar datos en Material_Reciclable
 INSERT INTO Material_Reciclable (nombre, puntos_por_unidad, co2_por_unidad, unidad_medida) VALUES
